@@ -1,7 +1,11 @@
 import { createTheme } from "@mui/material/styles";
 
 // Define your custom theme
-export const theme = createTheme({
+export const customTheme = createTheme({
+  colorSchemes: {
+    dark: true,
+  },
+
   palette: {
     primary: {
       main: "#8b5e3c", // A warm brown for a cozy, vintage feel
