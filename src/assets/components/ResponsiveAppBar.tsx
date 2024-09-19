@@ -12,6 +12,7 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import Logo from "./Logo/Logo";
+import ThemeModeSwitch from "./ThemeModeSwitch";
 
 const pages = ["Home", "Read", "Blog"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
@@ -163,6 +164,7 @@ function ResponsiveAppBar() {
               ))}
             </Menu>
           </Box>
+          <ThemeModeSwitch />
         </Toolbar>
       </Container>
     </AppBar>
