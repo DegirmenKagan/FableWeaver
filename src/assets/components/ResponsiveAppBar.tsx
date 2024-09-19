@@ -40,7 +40,7 @@ function ResponsiveAppBar() {
   };
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" color={"primary"}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Box sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}>
@@ -98,6 +98,7 @@ function ResponsiveAppBar() {
               ))}
             </Menu>
           </Box>
+
           <Box sx={{ display: { xs: "flex", md: "none" }, mr: 1 }}>
             <Logo />
           </Box>
