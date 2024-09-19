@@ -22,6 +22,10 @@ const CardSliderItem = (props: Props) => {
           src={`${img}?w=248&fit=crop&auto=format`}
           alt={title}
           loading="lazy"
+          style={{
+            userSelect: "none", // Disable text/image selection
+            pointerEvents: "none", // Disable any interactions (e.g., drag)
+          }}
         />
         <ImageListItemBar
           title={title}
