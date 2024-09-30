@@ -1,5 +1,5 @@
 import "./ReadPage.css";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Button, List, Typography, Paper, ListItem } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
@@ -10,7 +10,6 @@ import "@mdxeditor/editor/style.css";
 import {
   BoldItalicUnderlineToggles,
   MDXEditor,
-  MDXEditorMethods,
   Separator,
   UndoRedo,
   headingsPlugin,
@@ -58,7 +57,6 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 
 const ReadPage = () => {
   // State to manage the current page and underlined text
-  const editorRef = useRef<MDXEditorMethods | null>(null); // Ref for the editor methods
 
   const [currentPage, setCurrentPage] = useState(0);
   const [underlined, setUnderlined] = useState(false);
@@ -152,6 +150,19 @@ const ReadPage = () => {
                       <UndoRedo />
                       <BoldItalicUnderlineToggles />
                       <Separator />
+                      <Button
+                        variant="contained"
+                        startIcon={<ArrowBackIcon />}
+                        onClick={handlePrevPage}
+                        disabled={currentPage === 0}
+                      />
+
+                      <Button
+                        variant="contained"
+                        endIcon={<ArrowForwardIcon />}
+                        onClick={handleNextPage}
+                        disabled={currentPage === markdown.length - 1}
+                      />
                     </>
                   ),
                 }),
@@ -171,42 +182,8 @@ const ReadPage = () => {
       {/* Page Controls (Right Sidebar) */}
       <Box flex="1" pl={2}>
         <Typography variant="h6" gutterBottom>
-          Page Controls
+          Empty Space
         </Typography>
-        <Box display="flex" flexDirection="column" gap={2}>
-          <Button
-            variant="contained"
-            startIcon={<ArrowBackIcon />}
-            onClick={handlePrevPage}
-            disabled={currentPage === 0}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="contained"
-            endIcon={<ArrowForwardIcon />}
-            onClick={handleNextPage}
-            disabled={currentPage === markdown.length - 1}
-          >
-            Next
-          </Button>
-          <Button
-            variant="outlined"
-            startIcon={<FormatUnderlinedIcon />}
-            onClick={toggleUnderline}
-            color={underlined ? "secondary" : "primary"}
-          >
-            {underlined ? "Remove Underline" : "Underline Text"}
-          </Button>
-          <Button
-            variant="outlined"
-            startIcon={<FormatBold />}
-            onClick={toggleBold}
-            color={bold ? "secondary" : "primary"}
-          >
-            {bold ? "Remove Bold" : "Bold Text"}
-          </Button>
-        </Box>
       </Box>
     </Box>
   );
