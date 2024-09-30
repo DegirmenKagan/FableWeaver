@@ -13,8 +13,9 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import Logo from "./Logo/Logo";
 import ThemeModeSwitch from "./ThemeModeSwitch";
+import CustomLink from "./CustomLink";
 
-const pages = ["Home", "Read", "Blog"];
+const pages = ["Home", "Read", "Create"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 function ResponsiveAppBar() {
@@ -39,6 +40,9 @@ function ResponsiveAppBar() {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+  const handlePageItemClick = (event: React.MouseEvent<HTMLElement>) => {
+    console.log(event);
+  };
 
   return (
     <AppBar position="static" color={"primary"}>
@@ -47,11 +51,11 @@ function ResponsiveAppBar() {
           <Box sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}>
             <Logo />
           </Box>
+
           <Typography
             variant="h6"
             noWrap
             component="a"
-            href="#app-bar-with-responsive-menu"
             sx={{
               mr: 2,
               display: { xs: "none", md: "flex" },
@@ -62,7 +66,7 @@ function ResponsiveAppBar() {
               textDecoration: "none",
             }}
           >
-            Fable Weaver
+            <CustomLink to={"home"} text="Fable Weaver" />
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
@@ -93,8 +97,10 @@ function ResponsiveAppBar() {
               sx={{ display: { xs: "block", md: "none" } }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography sx={{ textAlign: "center" }}>{page}</Typography>
+                <MenuItem key={page} onClick={handlePageItemClick}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    <CustomLink to={page} />
+                  </Typography>
                 </MenuItem>
               ))}
             </Menu>
@@ -108,7 +114,6 @@ function ResponsiveAppBar() {
             variant="h5"
             noWrap
             component="a"
-            href="#app-bar-with-responsive-menu"
             sx={{
               mr: 2,
               display: { xs: "flex", md: "none" },
@@ -120,7 +125,7 @@ function ResponsiveAppBar() {
               textDecoration: "none",
             }}
           >
-            Fable Weaver
+            <CustomLink to={"home"} text="Fable Weaver" />
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages.map((page) => (
@@ -129,7 +134,7 @@ function ResponsiveAppBar() {
                 onClick={handleCloseNavMenu}
                 sx={{ my: 2, color: "white", display: "block" }}
               >
-                {page}
+                <CustomLink to={page} />
               </Button>
             ))}
           </Box>

@@ -1,19 +1,35 @@
-import ResponsiveAppBar from "./assets/components/ResponsiveAppBar";
 import "./App.css";
 import { ThemeProvider } from "@mui/material/styles";
-import { Container, CssBaseline } from "@mui/material";
+import { CssBaseline } from "@mui/material";
 import { customTheme } from "./assets/components/Theme";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import ErrorPage from "./assets/pages/ErrorPage";
+import ReadPage from "./assets/pages/ReadPage";
+import CreatePage from "./assets/pages/CreatePage";
 import Home from "./assets/components/Home";
+import ResponsiveAppBar from "./assets/components/ResponsiveAppBar";
 
 function App() {
+  function Root() {
+    return (
+      <Routes>
+        <Route element={<ResponsiveAppBar />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/read/1" element={<ReadPage />} />
+          <Route path="/create" element={<CreatePage />} />
+          <Route path="/*" element={<ErrorPage />} />
+        </Route>
+      </Routes>
+    );
+  }
+
   return (
     <div className="mainContainer">
       <ThemeProvider theme={customTheme}>
         <CssBaseline />
-        <ResponsiveAppBar />
-        <Container>
-          <Home />
-        </Container>
+        <BrowserRouter>
+          <Root />
+        </BrowserRouter>
       </ThemeProvider>
     </div>
   );
