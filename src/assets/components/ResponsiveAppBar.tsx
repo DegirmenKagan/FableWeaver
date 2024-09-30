@@ -66,7 +66,7 @@ function ResponsiveAppBar() {
               textDecoration: "none",
             }}
           >
-            <CustomLink to={"home"} text="Fable Weaver" />
+            <CustomLink to={""} text="Fable Weaver" />
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
@@ -125,7 +125,7 @@ function ResponsiveAppBar() {
               textDecoration: "none",
             }}
           >
-            <CustomLink to={"home"} text="Fable Weaver" />
+            <CustomLink to={""} text="Fable Weaver" />
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages.map((page) => (

@@ -6,10 +6,11 @@ type Props = {
 };
 
 const CustomLink = (props: Props) => {
+  const lowerCasedPage = props.to.toLowerCase();
   return (
     <Link
       style={{ textDecoration: "none", color: "inherit" }}
-      to={`/${props.to.toLowerCase()}`}
+      to={`/${lowerCasedPage === "home" ? "" : lowerCasedPage}`}
     >
       {props.text ?? props.to}
     </Link>
