@@ -1,26 +1,48 @@
 import "./ReadPage.css";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Box, Button, List, Typography, Paper, ListItem } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import FormatUnderlinedIcon from "@mui/icons-material/FormatUnderlined";
 import { styled } from "@mui/material/styles";
 import { FormatBold } from "@mui/icons-material";
+import "@mdxeditor/editor/style.css";
+import {
+  BoldItalicUnderlineToggles,
+  MDXEditor,
+  MDXEditorMethods,
+  Separator,
+  UndoRedo,
+  headingsPlugin,
+  listsPlugin,
+  markdownShortcutPlugin,
+  quotePlugin,
+  thematicBreakPlugin,
+  toolbarPlugin,
+} from "@mdxeditor/editor";
 
 // Dummy chapters for the chapter tree
 const chapters = [
-  { id: 1, title: "Chapter 1: Introduction" },
-  { id: 2, title: "Chapter 2: The Journey" },
-  { id: 3, title: "Chapter 3: Challenges Ahead" },
-  { id: 4, title: "Chapter 4: The Climax" },
-];
-
-// Dummy text content for the book
-const textContent = [
-  "This is the first page of the book. It's all about setting the scene...",
-  "The journey begins with the main character stepping into the unknown...",
-  "Challenges emerge, testing the character's strength and resolve...",
-  "Finally, the climax reveals the hidden truth that changes everything...",
+  {
+    id: 1,
+    title: "Chapter 1: Introduction",
+    content: "This is the first chapter",
+  },
+  {
+    id: 2,
+    title: "Chapter 2: The Journey",
+    content: "This is the second chapter",
+  },
+  {
+    id: 3,
+    title: "Chapter 3: Challenges Ahead",
+    content: "This is the third chapter",
+  },
+  {
+    id: 4,
+    title: "Chapter 4: The Climax",
+    content: "This is the fourth chapter",
+  },
 ];
 
 // Styled paper for reading content
@@ -36,13 +58,16 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 
 const ReadPage = () => {
   // State to manage the current page and underlined text
+  const editorRef = useRef<MDXEditorMethods | null>(null); // Ref for the editor methods
+
   const [currentPage, setCurrentPage] = useState(0);
   const [underlined, setUnderlined] = useState(false);
   const [bold, setBold] = useState(false);
+  const [markdown, setMarkdown] = useState<string>(chapters[0]?.content);
 
   // Function to handle next page
   const handleNextPage = () => {
-    if (currentPage < textContent.length - 1) {
+    if (currentPage < chapters.length - 1) {
       setCurrentPage(currentPage + 1);
     }
   };
@@ -66,6 +91,28 @@ const ReadPage = () => {
   const handleChapterClick = (chapterId: number) => {
     setCurrentPage(chapterId - 1);
   };
+
+  useEffect(() => {
+    if (currentPage >= 0 && currentPage < chapters.length) {
+      setMarkdown("-1");
+      //wait 1 seconds
+      setTimeout(() => {
+        console.log(
+          "Current Page: ",
+          currentPage,
+          chapters[currentPage].content
+        );
+        setMarkdown(chapters[currentPage].content);
+      }, 50);
+    }
+  }, [currentPage]);
+
+  // Effect to set initial content on mount
+  useEffect(() => {
+    if (markdown !== "-1") {
+      chapters[currentPage ?? 0].content = markdown;
+    }
+  }, [markdown]); // Only run once on mount
 
   return (
     <Box display="flex" width="100%" height="100vh" p={2}>
@@ -94,15 +141,30 @@ const ReadPage = () => {
       {/* Text Reader (Middle Section) */}
       <Box flex="2" px={2}>
         <StyledPaper>
-          <Typography
-            variant="body1"
-            component="p"
-            style={{
-              textDecoration: underlined ? "underline" : bold ? "bold" : "none",
-            }}
-          >
-            {textContent[currentPage]}
-          </Typography>
+          {markdown !== "-1" ? (
+            <MDXEditor
+              markdown={markdown}
+              onChange={(value) => setMarkdown(value)}
+              plugins={[
+                toolbarPlugin({
+                  toolbarContents: () => (
+                    <>
+                      <UndoRedo />
+                      <BoldItalicUnderlineToggles />
+                      <Separator />
+                    </>
+                  ),
+                }),
+                headingsPlugin(),
+                listsPlugin(),
+                quotePlugin(),
+                thematicBreakPlugin(),
+                markdownShortcutPlugin(),
+              ]}
+            />
+          ) : (
+            <></>
+          )}
         </StyledPaper>
       </Box>
 
@@ -124,7 +186,7 @@ const ReadPage = () => {
             variant="contained"
             endIcon={<ArrowForwardIcon />}
             onClick={handleNextPage}
-            disabled={currentPage === textContent.length - 1}
+            disabled={currentPage === markdown.length - 1}
           >
             Next
           </Button>
