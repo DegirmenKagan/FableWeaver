@@ -3,14 +3,12 @@ import { useEffect, useState } from "react";
 import { Box, Button, List, Typography, Paper, ListItem } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import FormatUnderlinedIcon from "@mui/icons-material/FormatUnderlined";
 import { styled } from "@mui/material/styles";
-import { FormatBold } from "@mui/icons-material";
+import { Edit } from "@mui/icons-material";
 import "@mdxeditor/editor/style.css";
 import {
   BoldItalicUnderlineToggles,
   MDXEditor,
-  Separator,
   UndoRedo,
   headingsPlugin,
   listsPlugin,
@@ -59,9 +57,8 @@ const ReadPage = () => {
   // State to manage the current page and underlined text
 
   const [currentPage, setCurrentPage] = useState(0);
-  const [underlined, setUnderlined] = useState(false);
-  const [bold, setBold] = useState(false);
   const [markdown, setMarkdown] = useState<string>(chapters[0]?.content);
+  const [editMode, setEditMode] = useState<number>(-1);
 
   // Function to handle next page
   const handleNextPage = () => {
@@ -77,17 +74,17 @@ const ReadPage = () => {
     }
   };
 
-  // Toggle underline feature
-  const toggleUnderline = () => {
-    setUnderlined(!underlined);
-  };
-
-  const toggleBold = () => {
-    setBold(!bold);
-  };
-
   const handleChapterClick = (chapterId: number) => {
     setCurrentPage(chapterId - 1);
+  };
+
+  const handleEdit = (oldState: number) => {
+    setEditMode(-1);
+    //wait little bit
+    setTimeout(() => {
+      console.log("Current Page: ", currentPage, chapters[currentPage].content);
+      setEditMode(oldState == 1 ? 0 : 1);
+    }, 50);
   };
 
   useEffect(() => {
@@ -140,39 +137,36 @@ const ReadPage = () => {
       <Box flex="2" px={2}>
         <StyledPaper>
           {markdown !== "-1" ? (
-            <MDXEditor
-              markdown={markdown}
-              onChange={(value) => setMarkdown(value)}
-              plugins={[
-                toolbarPlugin({
-                  toolbarContents: () => (
-                    <>
-                      <UndoRedo />
-                      <BoldItalicUnderlineToggles />
-                      <Separator />
-                      <Button
-                        variant="contained"
-                        startIcon={<ArrowBackIcon />}
-                        onClick={handlePrevPage}
-                        disabled={currentPage === 0}
-                      />
-
-                      <Button
-                        variant="contained"
-                        endIcon={<ArrowForwardIcon />}
-                        onClick={handleNextPage}
-                        disabled={currentPage === markdown.length - 1}
-                      />
-                    </>
-                  ),
-                }),
-                headingsPlugin(),
-                listsPlugin(),
-                quotePlugin(),
-                thematicBreakPlugin(),
-                markdownShortcutPlugin(),
-              ]}
-            />
+            editMode === 1 ? (
+              <MDXEditor
+                markdown={markdown}
+                onChange={(value) => setMarkdown(value)}
+                plugins={[
+                  toolbarPlugin({
+                    toolbarContents: () => (
+                      <>
+                        <UndoRedo />
+                        <BoldItalicUnderlineToggles />
+                        <Box sx={{ flex: 1 }}></Box>
+                      </>
+                    ),
+                  }),
+                  headingsPlugin(),
+                  listsPlugin(),
+                  quotePlugin(),
+                  thematicBreakPlugin(),
+                  markdownShortcutPlugin(),
+                ]}
+              />
+            ) : editMode === 0 ? (
+              <MDXEditor
+                markdown={markdown}
+                onChange={(value) => setMarkdown(value)}
+                readOnly
+              />
+            ) : (
+              <></>
+            )
           ) : (
             <></>
           )}
@@ -184,6 +178,32 @@ const ReadPage = () => {
         <Typography variant="h6" gutterBottom>
           Empty Space
         </Typography>
+        <Box display="flex" flexDirection="column" gap={2}>
+          <Button
+            variant="contained"
+            startIcon={<ArrowBackIcon />}
+            onClick={handlePrevPage}
+            disabled={currentPage === 0}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="contained"
+            endIcon={<ArrowForwardIcon />}
+            onClick={handleNextPage}
+            disabled={currentPage === markdown.length - 1}
+          >
+            Next
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<Edit />}
+            onClick={() => handleEdit(editMode)}
+            // disabled={} if user is not an editor
+          >
+            Edit
+          </Button>
+        </Box>
       </Box>
     </Box>
   );
