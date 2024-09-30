@@ -1,0 +1,15 @@
+.chapterListItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e0e0e0;
+
+  cursor: pointer;
+  user-select: none;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.chapterListItem:hover {
+  background-color: darkgoldenrod;
+}
