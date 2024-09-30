@@ -5,8 +5,9 @@ export default function Layout() {
   return (
     <div>
       <ResponsiveAppBar />
-      <hr />
-      <Outlet />
+      <div style={{ marginBlock: 20 }}>
+        <Outlet />
+      </div>
     </div>
   );
 }
