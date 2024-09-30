@@ -9,11 +9,6 @@ html {
   overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
-Link {
-  text-decoration: none;
-  color: "inherit";
-}
-
 .mainContainer {
   /* display: flex;
   flex-direction: column;
