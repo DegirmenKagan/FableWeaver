@@ -4,7 +4,7 @@ import { Box, Button, List, Typography, Paper, ListItem } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { styled } from "@mui/material/styles";
-import { Edit } from "@mui/icons-material";
+import { Delete, Edit, NoteAdd } from "@mui/icons-material";
 import "@mdxeditor/editor/style.css";
 import {
   BoldItalicUnderlineToggles,
@@ -58,7 +58,7 @@ const ReadPage = () => {
 
   const [currentPage, setCurrentPage] = useState(0);
   const [markdown, setMarkdown] = useState<string>(chapters[0]?.content);
-  const [editMode, setEditMode] = useState<number>(-1);
+  const [editMode, setEditMode] = useState<number>(0);
 
   // Function to handle next page
   const handleNextPage = () => {
@@ -85,6 +85,27 @@ const ReadPage = () => {
       console.log("Current Page: ", currentPage, chapters[currentPage].content);
       setEditMode(oldState == 1 ? 0 : 1);
     }, 50);
+  };
+  const handleNewPage = () => {
+    const newChapter = {
+      id: chapters.length + 1,
+      title: `Chapter ${chapters.length + 1}: New Chapter`,
+      content: "This is a new chapter",
+    };
+    chapters.push(newChapter);
+    setCurrentPage(chapters.length - 1);
+  };
+
+  const handleDeletePage = () => {
+    // delete the current page
+    chapters.splice(currentPage, 1);
+
+    // update the content of the current page
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    } else {
+      setCurrentPage(0);
+    }
   };
 
   useEffect(() => {
@@ -189,7 +210,7 @@ const ReadPage = () => {
           </Button>
           <Button
             variant="contained"
-            endIcon={<ArrowForwardIcon />}
+            startIcon={<ArrowForwardIcon />}
             onClick={handleNextPage}
             disabled={currentPage === markdown.length - 1}
           >
@@ -202,6 +223,22 @@ const ReadPage = () => {
             // disabled={} if user is not an editor
           >
             Edit
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<NoteAdd />}
+            onClick={handleNewPage}
+            disabled={editMode === 0} // add the "if user is not an editor"
+          >
+            Add Page
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<Delete />}
+            onClick={handleDeletePage}
+            disabled={editMode === 0 || chapters.length <= 1} // add the "if user is not an editor"
+          >
+            Delete Page
           </Button>
         </Box>
       </Box>
