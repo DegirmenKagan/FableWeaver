@@ -6,6 +6,8 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { styled } from "@mui/material/styles";
 import "@mdxeditor/editor/style.css";
 import { MDXEditor } from "@mdxeditor/editor";
+import { useParams } from "react-router-dom";
+import { Book } from "../types/types";
 
 // Dummy chapters for the chapter tree
 const chapters = [
@@ -47,6 +49,16 @@ const ReadPage = () => {
 
   const [currentPage, setCurrentPage] = useState(0);
   const [markdown, setMarkdown] = useState<string>(chapters[0]?.content);
+  const { bookId } = useParams();
+
+  const [book, setBook] = useState<Book>();
+
+  const doGetBook = async (bookId: number) => {
+    const response = await fetch(`http://localhost:3000/book/${bookId}`);
+    const data = await response.json();
+    console.log(data);
+    setBook(data);
+  };
 
   // Function to handle next page
   const handleNextPage = () => {
@@ -88,8 +100,20 @@ const ReadPage = () => {
     }
   }, [markdown]); // Only run once on mount
 
+  useEffect(() => {
+    if (bookId) {
+      const validId = parseInt(bookId);
+      if (validId > 0) {
+        doGetBook(validId);
+      }
+    }
+  }, [bookId]);
+
   return (
     <Box display="flex" width="100%" height="100vh" p={2}>
+      <Typography variant="h4" gutterBottom>
+        {}
+      </Typography>
       {/* Chapter Tree (Left Sidebar) */}
       <Box flex="1" pr={2}>
         <Typography variant="h4" gutterBottom>

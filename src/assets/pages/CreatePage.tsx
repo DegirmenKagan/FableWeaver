@@ -4,7 +4,7 @@ import { Box, Button, List, Typography, Paper, ListItem } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { styled } from "@mui/material/styles";
-import { Delete, Edit, NoteAdd } from "@mui/icons-material";
+import { Delete, Edit, NoteAdd, Save } from "@mui/icons-material";
 import "@mdxeditor/editor/style.css";
 import {
   BoldItalicUnderlineToggles,
@@ -17,6 +17,7 @@ import {
   thematicBreakPlugin,
   toolbarPlugin,
 } from "@mdxeditor/editor";
+import { Book } from "../types/types";
 
 // Dummy chapters for the chapter tree
 const chapters = [
@@ -59,6 +60,7 @@ const CreatePage = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [markdown, setMarkdown] = useState<string>(chapters[0]?.content);
   const [editMode, setEditMode] = useState<number>(0);
+  const [book, setBook] = useState<Book>();
 
   // Function to handle next page
   const handleNextPage = () => {
@@ -106,6 +108,18 @@ const CreatePage = () => {
     } else {
       setCurrentPage(0);
     }
+  };
+
+  const doSaveBook = async (book: Book) => {
+    const response = await fetch(`http://localhost:3000/book/${book.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(book),
+    });
+    const data = await response.json();
+    console.log(data);
   };
 
   useEffect(() => {
@@ -239,6 +253,14 @@ const CreatePage = () => {
             disabled={editMode === 0 || chapters.length <= 1} // add the "if user is not an editor"
           >
             Delete Page
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<Save />}
+            onClick={() => doSaveBook(book)}
+            disabled={editMode === 0 || chapters.length <= 1} // add the "if user is not an editor"
+          >
+            Save Book
           </Button>
         </Box>
       </Box>

@@ -15,8 +15,8 @@ function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
-          <Route path="/read/*" element={<ReadPage />} />
-          <Route path="/create" element={<CreatePage />} />
+          <Route path="/read/:bookId" element={<ReadPage />} />
+          <Route path="/create:bookId" element={<CreatePage />} />
           <Route path="/*" element={<ErrorPage />} />
         </Route>
       </Routes>
