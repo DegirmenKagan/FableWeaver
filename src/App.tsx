@@ -9,6 +9,7 @@ import CreatePage from "./assets/pages/PaperPages/CreatePage";
 import HomePage from "./assets/pages/HomePage";
 import Layout from "./assets/pages/Layout";
 import LibraryPage from "./assets/pages/LibraryPage/LibraryPage";
+import BookPage from "./assets/pages/BookPage/BookPage";
 
 function App() {
   function Root() {
@@ -19,6 +20,7 @@ function App() {
           <Route path="/read/:bookId" element={<ReadPage />} />
           <Route path="/create/:bookId" element={<CreatePage />} />
           <Route path="/library" element={<LibraryPage />} />
+          <Route path="/book/:bookId" element={<BookPage />} />
           <Route path="/*" element={<ErrorPage />} />
         </Route>
       </Routes>

@@ -18,7 +18,7 @@ const CardSliderItem = (props: Props) => {
   const handleImgClick = () => {
     setClicked(!clicked);
     console.log(`Image ${bookId} clicked`);
-    navigate(`/read/${bookId}`);
+    navigate(`/book/${bookId}`);
   };
 
   return (

@@ -6,6 +6,7 @@ export const emptyBook: Book = {
   title: "",
   author: "",
   chapters: [],
+  favorite: false,
 };
 
 export const chapters: Chapter[] = [

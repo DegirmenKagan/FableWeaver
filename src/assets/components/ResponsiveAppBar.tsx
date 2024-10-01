@@ -14,7 +14,7 @@ import Logo from "./Logo/Logo";
 import ThemeModeSwitch from "./ThemeModeSwitch";
 import CustomLink from "./CustomLink";
 
-const pages = ["Home", "Library", "Create"];
+const pages = ["Home", "Library"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 function ResponsiveAppBar() {

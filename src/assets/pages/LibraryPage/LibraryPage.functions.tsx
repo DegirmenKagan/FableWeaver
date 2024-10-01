@@ -69,8 +69,12 @@ export const deleteBook = (
 // Function to open the reading page (navigate or display in a modal)
 export const openBook = (id: number, navigate: NavigateFunction) => {
   // alert(`Opening book with ID: ${id}`);
-  navigate(`/read/${id}`);
+  navigate(`/book/${id}`);
   // You can implement navigation to a reading page here
+};
+
+export const readBook = (id: number, navigate: NavigateFunction) => {
+  navigate(`/read/${id}`);
 };
 
 // Function to edit a book (this can open an edit modal or navigate to an edit page)
