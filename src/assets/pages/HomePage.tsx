@@ -1,9 +1,9 @@
-import CardSlider from "./CardSlider";
+import CardSlider from "../components/CardSlider";
 import { Container, Stack } from "@mui/material";
 
 // type Props = {};
 
-const Home = () => {
+const HomePage = () => {
   return (
     <Container>
       <Stack gap={5}>
@@ -15,4 +15,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default HomePage;
