@@ -10,4 +10,5 @@ export type Book = {
   title: string;
   author: string;
   chapters: Chapter[];
+  favorite: boolean;
 };

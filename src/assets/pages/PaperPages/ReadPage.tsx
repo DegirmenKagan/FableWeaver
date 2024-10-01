@@ -1,48 +1,22 @@
 import "./ReadPage.css";
 import { useEffect, useState } from "react";
-import { Box, Button, List, Typography, Paper, ListItem } from "@mui/material";
+import { Box, Button, List, Typography, ListItem } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import { styled } from "@mui/material/styles";
+
 import "@mdxeditor/editor/style.css";
 import { MDXEditor } from "@mdxeditor/editor";
 import { useParams } from "react-router-dom";
-import { Book } from "../types/types";
-
-// Dummy chapters for the chapter tree
-const chapters = [
-  {
-    id: 1,
-    title: "Chapter 1: Introduction",
-    content: "This is the first chapter",
-  },
-  {
-    id: 2,
-    title: "Chapter 2: The Journey",
-    content: "This is the second chapter",
-  },
-  {
-    id: 3,
-    title: "Chapter 3: Challenges Ahead",
-    content: "This is the third chapter",
-  },
-  {
-    id: 4,
-    title: "Chapter 4: The Climax",
-    content: "This is the fourth chapter",
-  },
-];
-
-// Styled paper for reading content
-const StyledPaper = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3),
-  minHeight: "400px",
-  maxHeight: "600px",
-  overflowY: "auto",
-  fontSize: "1.2rem",
-  lineHeight: "1.75",
-  textAlign: "justify",
-}));
+import { Book } from "../../types/types";
+import {
+  chapters,
+  doGetBook,
+  emptyBook,
+  handleChapterClick,
+  handleNextPage,
+  handlePrevPage,
+} from "./PaperPage.functions";
+import { StyledPaper } from "../../components/StyledPaper";
 
 const ReadPage = () => {
   // State to manage the current page and underlined text
@@ -51,32 +25,7 @@ const ReadPage = () => {
   const [markdown, setMarkdown] = useState<string>(chapters[0]?.content);
   const { bookId } = useParams();
 
-  const [book, setBook] = useState<Book>();
-
-  const doGetBook = async (bookId: number) => {
-    const response = await fetch(`http://localhost:3000/book/${bookId}`);
-    const data = await response.json();
-    console.log(data);
-    setBook(data);
-  };
-
-  // Function to handle next page
-  const handleNextPage = () => {
-    if (currentPage < chapters.length - 1) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  // Function to handle previous page
-  const handlePrevPage = () => {
-    if (currentPage > 0) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleChapterClick = (chapterId: number) => {
-    setCurrentPage(chapterId - 1);
-  };
+  const [book, setBook] = useState<Book>(emptyBook);
 
   useEffect(() => {
     if (currentPage >= 0 && currentPage < chapters.length) {
@@ -104,7 +53,7 @@ const ReadPage = () => {
     if (bookId) {
       const validId = parseInt(bookId);
       if (validId > 0) {
-        doGetBook(validId);
+        doGetBook(validId, setBook);
       }
     }
   }, [bookId]);
@@ -124,7 +73,7 @@ const ReadPage = () => {
             <ListItem
               className="chapterListItem"
               key={chapter.id}
-              onClick={() => handleChapterClick(chapter.id)}
+              onClick={() => handleChapterClick(chapter.id, setCurrentPage)}
               style={{
                 backgroundColor:
                   currentPage === chapter.id - 1 ? "lightgray" : undefined,
@@ -160,7 +109,7 @@ const ReadPage = () => {
           <Button
             variant="contained"
             startIcon={<ArrowBackIcon />}
-            onClick={handlePrevPage}
+            onClick={() => handlePrevPage(currentPage, setCurrentPage)}
             disabled={currentPage === 0}
           >
             Previous
@@ -168,7 +117,9 @@ const ReadPage = () => {
           <Button
             variant="contained"
             startIcon={<ArrowForwardIcon />}
-            onClick={handleNextPage}
+            onClick={() =>
+              handleNextPage(currentPage, setCurrentPage, chapters)
+            }
             disabled={currentPage === markdown.length - 1}
           >
             Next

@@ -1,9 +1,8 @@
 import "./ReadPage.css";
 import { useEffect, useState } from "react";
-import { Box, Button, List, Typography, Paper, ListItem } from "@mui/material";
+import { Box, Button, List, Typography, ListItem } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import { styled } from "@mui/material/styles";
 import { Delete, Edit, NoteAdd, Save } from "@mui/icons-material";
 import "@mdxeditor/editor/style.css";
 import {
@@ -17,110 +16,31 @@ import {
   thematicBreakPlugin,
   toolbarPlugin,
 } from "@mdxeditor/editor";
-import { Book } from "../types/types";
-
-// Dummy chapters for the chapter tree
-const chapters = [
-  {
-    id: 1,
-    title: "Chapter 1: Introduction",
-    content: "This is the first chapter",
-  },
-  {
-    id: 2,
-    title: "Chapter 2: The Journey",
-    content: "This is the second chapter",
-  },
-  {
-    id: 3,
-    title: "Chapter 3: Challenges Ahead",
-    content: "This is the third chapter",
-  },
-  {
-    id: 4,
-    title: "Chapter 4: The Climax",
-    content: "This is the fourth chapter",
-  },
-];
-
-// Styled paper for reading content
-const StyledPaper = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3),
-  minHeight: "400px",
-  maxHeight: "600px",
-  overflowY: "auto",
-  fontSize: "1.2rem",
-  lineHeight: "1.75",
-  textAlign: "justify",
-}));
+import { Book } from "../../types/types";
+import { useParams } from "react-router-dom";
+import {
+  chapters,
+  doGetBook,
+  doSaveBook,
+  emptyBook,
+  handleChapterClick,
+  handleDeletePage,
+  handleEdit,
+  handleNewPage,
+  handleNextPage,
+  handlePrevPage,
+} from "./PaperPage.functions";
+import { StyledPaper } from "../../components/StyledPaper";
 
 const CreatePage = () => {
   // State to manage the current page and underlined text
 
+  const { bookId } = useParams();
+
   const [currentPage, setCurrentPage] = useState(0);
   const [markdown, setMarkdown] = useState<string>(chapters[0]?.content);
   const [editMode, setEditMode] = useState<number>(0);
-  const [book, setBook] = useState<Book>();
-
-  // Function to handle next page
-  const handleNextPage = () => {
-    if (currentPage < chapters.length - 1) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  // Function to handle previous page
-  const handlePrevPage = () => {
-    if (currentPage > 0) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleChapterClick = (chapterId: number) => {
-    setCurrentPage(chapterId - 1);
-  };
-
-  const handleEdit = (oldState: number) => {
-    setEditMode(-1);
-    //wait little bit
-    setTimeout(() => {
-      console.log("Current Page: ", currentPage, chapters[currentPage].content);
-      setEditMode(oldState == 1 ? 0 : 1);
-    }, 50);
-  };
-  const handleNewPage = () => {
-    const newChapter = {
-      id: chapters.length + 1,
-      title: `Chapter ${chapters.length + 1}: New Chapter`,
-      content: "This is a new chapter",
-    };
-    chapters.push(newChapter);
-    setCurrentPage(chapters.length - 1);
-  };
-
-  const handleDeletePage = () => {
-    // delete the current page
-    chapters.splice(currentPage, 1);
-
-    // update the content of the current page
-    if (currentPage > 0) {
-      setCurrentPage(currentPage - 1);
-    } else {
-      setCurrentPage(0);
-    }
-  };
-
-  const doSaveBook = async (book: Book) => {
-    const response = await fetch(`http://localhost:3000/book/${book.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(book),
-    });
-    const data = await response.json();
-    console.log(data);
-  };
+  const [book, setBook] = useState<Book>(emptyBook);
 
   useEffect(() => {
     if (currentPage >= 0 && currentPage < chapters.length) {
@@ -144,6 +64,15 @@ const CreatePage = () => {
     }
   }, [markdown]); // Only run once on mount
 
+  useEffect(() => {
+    if (bookId) {
+      const validId = parseInt(bookId);
+      if (validId > 0) {
+        doGetBook(validId, setBook);
+      }
+    }
+  }, [bookId]);
+
   return (
     <Box display="flex" width="100%" height="100vh" p={2}>
       {/* Chapter Tree (Left Sidebar) */}
@@ -156,7 +85,7 @@ const CreatePage = () => {
             <ListItem
               className="chapterListItem"
               key={chapter.id}
-              onClick={() => handleChapterClick(chapter.id)}
+              onClick={() => handleChapterClick(chapter.id, setCurrentPage)}
               style={{
                 backgroundColor:
                   currentPage === chapter.id - 1 ? "lightgray" : undefined,
@@ -217,7 +146,7 @@ const CreatePage = () => {
           <Button
             variant="contained"
             startIcon={<ArrowBackIcon />}
-            onClick={handlePrevPage}
+            onClick={() => handlePrevPage(currentPage, setCurrentPage)}
             disabled={currentPage === 0}
           >
             Previous
@@ -225,7 +154,9 @@ const CreatePage = () => {
           <Button
             variant="contained"
             startIcon={<ArrowForwardIcon />}
-            onClick={handleNextPage}
+            onClick={() =>
+              handleNextPage(currentPage, setCurrentPage, chapters)
+            }
             disabled={currentPage === markdown.length - 1}
           >
             Next
@@ -233,7 +164,7 @@ const CreatePage = () => {
           <Button
             variant="contained"
             startIcon={<Edit />}
-            onClick={() => handleEdit(editMode)}
+            onClick={() => handleEdit(editMode, setEditMode, currentPage)}
             // disabled={} if user is not an editor
           >
             Edit
@@ -241,7 +172,7 @@ const CreatePage = () => {
           <Button
             variant="contained"
             startIcon={<NoteAdd />}
-            onClick={handleNewPage}
+            onClick={() => handleNewPage(chapters, setCurrentPage)}
             disabled={editMode === 0} // add the "if user is not an editor"
           >
             Add Page
@@ -249,7 +180,9 @@ const CreatePage = () => {
           <Button
             variant="contained"
             startIcon={<Delete />}
-            onClick={handleDeletePage}
+            onClick={() =>
+              handleDeletePage(chapters, currentPage, setCurrentPage)
+            }
             disabled={editMode === 0 || chapters.length <= 1} // add the "if user is not an editor"
           >
             Delete Page
