@@ -4,19 +4,8 @@ import { Box, Button, List, Typography, Paper, ListItem } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { styled } from "@mui/material/styles";
-import { Delete, Edit, NoteAdd } from "@mui/icons-material";
 import "@mdxeditor/editor/style.css";
-import {
-  BoldItalicUnderlineToggles,
-  MDXEditor,
-  UndoRedo,
-  headingsPlugin,
-  listsPlugin,
-  markdownShortcutPlugin,
-  quotePlugin,
-  thematicBreakPlugin,
-  toolbarPlugin,
-} from "@mdxeditor/editor";
+import { MDXEditor } from "@mdxeditor/editor";
 
 // Dummy chapters for the chapter tree
 const chapters = [
@@ -58,7 +47,6 @@ const ReadPage = () => {
 
   const [currentPage, setCurrentPage] = useState(0);
   const [markdown, setMarkdown] = useState<string>(chapters[0]?.content);
-  const [editMode, setEditMode] = useState<number>(0);
 
   // Function to handle next page
   const handleNextPage = () => {
@@ -76,36 +64,6 @@ const ReadPage = () => {
 
   const handleChapterClick = (chapterId: number) => {
     setCurrentPage(chapterId - 1);
-  };
-
-  const handleEdit = (oldState: number) => {
-    setEditMode(-1);
-    //wait little bit
-    setTimeout(() => {
-      console.log("Current Page: ", currentPage, chapters[currentPage].content);
-      setEditMode(oldState == 1 ? 0 : 1);
-    }, 50);
-  };
-  const handleNewPage = () => {
-    const newChapter = {
-      id: chapters.length + 1,
-      title: `Chapter ${chapters.length + 1}: New Chapter`,
-      content: "This is a new chapter",
-    };
-    chapters.push(newChapter);
-    setCurrentPage(chapters.length - 1);
-  };
-
-  const handleDeletePage = () => {
-    // delete the current page
-    chapters.splice(currentPage, 1);
-
-    // update the content of the current page
-    if (currentPage > 0) {
-      setCurrentPage(currentPage - 1);
-    } else {
-      setCurrentPage(0);
-    }
   };
 
   useEffect(() => {
@@ -158,36 +116,11 @@ const ReadPage = () => {
       <Box flex="2" px={2}>
         <StyledPaper>
           {markdown !== "-1" ? (
-            editMode === 1 ? (
-              <MDXEditor
-                markdown={markdown}
-                onChange={(value) => setMarkdown(value)}
-                plugins={[
-                  toolbarPlugin({
-                    toolbarContents: () => (
-                      <>
-                        <UndoRedo />
-                        <BoldItalicUnderlineToggles />
-                        <Box sx={{ flex: 1 }}></Box>
-                      </>
-                    ),
-                  }),
-                  headingsPlugin(),
-                  listsPlugin(),
-                  quotePlugin(),
-                  thematicBreakPlugin(),
-                  markdownShortcutPlugin(),
-                ]}
-              />
-            ) : editMode === 0 ? (
-              <MDXEditor
-                markdown={markdown}
-                onChange={(value) => setMarkdown(value)}
-                readOnly
-              />
-            ) : (
-              <></>
-            )
+            <MDXEditor
+              markdown={markdown}
+              onChange={(value) => setMarkdown(value)}
+              readOnly
+            />
           ) : (
             <></>
           )}
@@ -197,7 +130,7 @@ const ReadPage = () => {
       {/* Page Controls (Right Sidebar) */}
       <Box flex="1" pl={2}>
         <Typography variant="h6" gutterBottom>
-          Empty Space
+          Ads and Controls
         </Typography>
         <Box display="flex" flexDirection="column" gap={2}>
           <Button
@@ -215,30 +148,6 @@ const ReadPage = () => {
             disabled={currentPage === markdown.length - 1}
           >
             Next
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<Edit />}
-            onClick={() => handleEdit(editMode)}
-            // disabled={} if user is not an editor
-          >
-            Edit
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<NoteAdd />}
-            onClick={handleNewPage}
-            disabled={editMode === 0} // add the "if user is not an editor"
-          >
-            Add Page
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<Delete />}
-            onClick={handleDeletePage}
-            disabled={editMode === 0 || chapters.length <= 1} // add the "if user is not an editor"
-          >
-            Delete Page
           </Button>
         </Box>
       </Box>
