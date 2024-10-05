@@ -4,7 +4,9 @@ export const emptyBook: Book = {
   id: 0,
   img: "",
   title: "",
+  desc: "",
   author: "",
+  rating: undefined,
   chapters: [],
   favorite: false,
 };

@@ -8,7 +8,9 @@ export type Book = {
   id: number;
   img: string;
   title: string;
+  desc: string;
   author: string;
-  chapters: Chapter[];
+  rating?: number;
   favorite: boolean;
+  chapters: Chapter[];
 };
