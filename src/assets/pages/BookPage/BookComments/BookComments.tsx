@@ -14,20 +14,21 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { deepPurple } from "@mui/material/colors";
+import { Comment } from "../../../types/types";
 
 // Dummy comments for the book
-const initialComments = [
+const initialComments: Comment[] = [
   {
     id: 1,
     bookId: 1,
-    name: "John Doe",
+    username: "John Doe",
     text: "Amazing book! The writing style is fantastic.",
     avatar: "",
   },
   {
     id: 2,
     bookId: 1,
-    name: "Jane Smith",
+    username: "Jane Smith",
     text: "The ending left me speechless.",
     avatar: "",
   },
@@ -46,17 +47,17 @@ const BookComments = (props: Props) => {
     // setComments();
   };
 
-  const addComment = async () => {
+  const addComment = async (comment: Comment) => {
     // Add the comment to the server
   };
 
   // Function to handle adding a new comment
   const handleAddComment = () => {
     if (newComment.trim() !== "") {
-      const comment = {
+      const comment: Comment = {
         id: comments.length + 1,
         bookId: props.bookId,
-        name: "Anonymous", // For now, the name is static, can be dynamic based on user data
+        username: "Anonymous", // For now, the name is static, can be dynamic based on user data
         text: newComment,
         avatar: "", // Could be dynamic if the user has an avatar
       };
@@ -106,11 +107,11 @@ const BookComments = (props: Props) => {
           <ListItem key={comment.id} alignItems="flex-start">
             <ListItemAvatar>
               <Avatar sx={{ bgcolor: deepPurple[500] }}>
-                {comment.name.charAt(0)}
+                {comment.username.charAt(0)}
               </Avatar>
             </ListItemAvatar>
             <ListItemText
-              primary={comment.name}
+              primary={comment.username}
               secondary={
                 <Typography variant="body2">{comment.text}</Typography>
               }

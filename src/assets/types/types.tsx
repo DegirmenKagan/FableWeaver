@@ -14,3 +14,11 @@ export type Book = {
   favorite: boolean;
   chapters: Chapter[];
 };
+
+export type Comment = {
+  id: number;
+  bookId: number;
+  username: string;
+  text: string;
+  avatar: string;
+};
