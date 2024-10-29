@@ -10,20 +10,27 @@ import HomePage from "./assets/pages/HomePage";
 import Layout from "./assets/pages/Layout";
 import LibraryPage from "./assets/pages/LibraryPage/LibraryPage";
 import BookPage from "./assets/pages/BookPage/BookPage";
+import ProfilePage from "./assets/pages/ProfilePage/ProfilePage";
+import { ProfileProvider } from "./assets/contexts/ProfileContext";
+import SettingPage from "./assets/pages/SettingPage/SettingPage";
 
 function App() {
   function Root() {
     return (
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/read/:bookId" element={<ReadPage />} />
-          <Route path="/create/:bookId" element={<CreatePage />} />
-          <Route path="/library" element={<LibraryPage />} />
-          <Route path="/book/:bookId" element={<BookPage />} />
-          <Route path="/*" element={<ErrorPage />} />
-        </Route>
-      </Routes>
+      <ProfileProvider>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/read/:bookId" element={<ReadPage />} />
+            <Route path="/create/:bookId" element={<CreatePage />} />
+            <Route path="/library" element={<LibraryPage />} />
+            <Route path="/book/:bookId" element={<BookPage />} />
+            <Route path="/profile/:userId" element={<ProfilePage />} />
+            <Route path="/settings" element={<SettingPage />} />
+            <Route path="/*" element={<ErrorPage />} />
+          </Route>
+        </Routes>
+      </ProfileProvider>
     );
   }
 

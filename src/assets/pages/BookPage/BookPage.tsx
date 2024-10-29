@@ -51,7 +51,7 @@ const BookPage = () => {
             {book.author}
           </Typography>
           <Typography variant="body1" paragraph>
-            {book.desc}
+            {book.description}
           </Typography>
 
           {/* Star Rating */}

@@ -1,3 +1,18 @@
+export type User = {
+  id: number;
+  name: string;
+  username: string;
+  password: string;
+  email: string;
+  avatar: string;
+};
+
+export type ProfileError = {
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+};
+
 export type Chapter = {
   id: number;
   title: string;
@@ -8,11 +23,24 @@ export type Book = {
   id: number;
   img: string;
   title: string;
-  desc: string;
+  description: string;
   author: string;
   rating?: number;
   favorite: boolean;
   chapters: Chapter[];
+};
+
+export type BookFavorite = {
+  id: number;
+  bookId: number;
+  userId: number;
+};
+
+export type BookRating = {
+  id: number;
+  bookId: number;
+  userId: number;
+  rating: number;
 };
 
 export type Comment = {

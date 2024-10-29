@@ -13,11 +13,15 @@ import MenuItem from "@mui/material/MenuItem";
 import Logo from "./Logo/Logo";
 import ThemeModeSwitch from "./ThemeModeSwitch";
 import CustomLink from "./CustomLink";
-
-const pages = ["Home", "Library"];
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+import { useNavigate } from "react-router-dom";
+import { ProfileContext } from "../contexts/ProfileContext";
 
 function ResponsiveAppBar() {
+  const navigate = useNavigate();
+  const { profile } = React.useContext(ProfileContext);
+
+  const pages = ["Home", "Library"];
+  const settings = ["Home", "Profile", "Settings", "Logout"];
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
@@ -36,8 +40,21 @@ function ResponsiveAppBar() {
     setAnchorElNav(null);
   };
 
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
+  const handleCloseUserMenu = (selectionStr?: string) => {
+    console.log(selectionStr);
+    if (!selectionStr) {
+      setAnchorElUser(null);
+      return;
+    } else {
+      if (selectionStr === "Profile") {
+        navigate(`${selectionStr.toLowerCase()}/${profile.id}`);
+      } else if (selectionStr === "Home") {
+        navigate("/");
+      } else {
+        navigate(`${selectionStr.toLowerCase()}`);
+      }
+      setAnchorElUser(null);
+    }
   };
   const handlePageItemClick = (event: React.MouseEvent<HTMLElement>) => {
     console.log(event);
@@ -145,8 +162,8 @@ function ResponsiveAppBar() {
                 <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
               </IconButton>
             </Tooltip>
-            <Menu
-              sx={{ mt: "45px" }}
+            {/* <Menu
+              sx={{ mt: "45px", position: "absolute", zIndex: 1 }}
               id="menu-appbar"
               anchorEl={anchorElUser}
               anchorOrigin={{
@@ -162,7 +179,63 @@ function ResponsiveAppBar() {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                <MenuItem
+                  key={setting}
+                  onClick={() => handleCloseUserMenu(setting)}
+                >
+                  <Typography sx={{ textAlign: "center" }}>
+                    {setting}
+                  </Typography>
+                </MenuItem>
+              ))}
+            </Menu> */}
+
+            <Menu
+              anchorEl={anchorElUser}
+              id="account-menu"
+              open={Boolean(anchorElUser)}
+              onClose={() => {
+                handleCloseUserMenu();
+              }}
+              onClick={() => {
+                handleCloseUserMenu();
+              }}
+              slotProps={{
+                paper: {
+                  elevation: 0,
+                  sx: {
+                    overflow: "visible",
+                    filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                    mt: 1.5,
+                    "& .MuiAvatar-root": {
+                      width: 32,
+                      height: 32,
+                      ml: -0.5,
+                      mr: 1,
+                    },
+                    "&::before": {
+                      content: '""',
+                      display: "block",
+                      position: "absolute",
+                      top: 0,
+                      right: 14,
+                      width: 10,
+                      height: 10,
+                      bgcolor: "background.paper",
+                      transform: "translateY(-50%) rotate(45deg)",
+                      zIndex: 0,
+                    },
+                  },
+                },
+              }}
+              transformOrigin={{ horizontal: "right", vertical: "top" }}
+              anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+            >
+              {settings.map((setting) => (
+                <MenuItem
+                  key={setting}
+                  onClick={() => handleCloseUserMenu(setting)}
+                >
                   <Typography sx={{ textAlign: "center" }}>
                     {setting}
                   </Typography>
