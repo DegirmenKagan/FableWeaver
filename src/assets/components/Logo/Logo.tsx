@@ -8,6 +8,7 @@ const Logo = (props: Props) => {
   return (
     <div className="logoContainer">
       <img
+        className="logo"
         srcSet={`${logoPng}?w=164&h=164&fit=crop&auto=format&dpr=2 ${
           (props.size ?? 40) / 4
         }x`}
