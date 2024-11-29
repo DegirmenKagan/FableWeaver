@@ -1,5 +1,6 @@
 export type User = {
   id: number;
+  createdAt: Date;
   name: string;
   username: string;
   password: string;
@@ -8,7 +9,10 @@ export type User = {
 };
 
 export type ProfileError = {
+  username?: string;
+  name?: string;
   email?: string;
+  oldPassword?: string;
   password?: string;
   confirmPassword?: string;
 };

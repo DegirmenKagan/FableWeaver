@@ -15,19 +15,21 @@ import ThemeModeSwitch from "./ThemeModeSwitch";
 import CustomLink from "./CustomLink";
 import { useNavigate } from "react-router-dom";
 import { ProfileContext } from "../contexts/ProfileContext";
+import { useContext, useEffect, useState } from "react";
+import AuthDialog from "./AuthDialog";
 
 function ResponsiveAppBar() {
   const navigate = useNavigate();
-  const { profile } = React.useContext(ProfileContext);
+  const { profile } = useContext(ProfileContext);
 
   const pages = ["Home", "Library"];
   const settings = ["Home", "Profile", "Settings", "Logout"];
-  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
-    null
-  );
-  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
-    null
-  );
+  const settingsGuest = ["Home", "Login", "Register"];
+  const [settingList, setSettingList] = useState(settings);
+  const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
+  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [isAuthLogin, setIsAuthLogin] = useState(false);
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -50,6 +52,14 @@ function ResponsiveAppBar() {
         navigate(`${selectionStr.toLowerCase()}/${profile.id}`);
       } else if (selectionStr === "Home") {
         navigate("/");
+      } else if (
+        selectionStr === "Login" ||
+        selectionStr === "Logout" ||
+        selectionStr == "Register"
+      ) {
+        setIsAuthLogin(selectionStr === "Login");
+        console.log("selectionlogin", selectionStr === "Login");
+        setAuthModalOpen(true);
       } else {
         navigate(`${selectionStr.toLowerCase()}`);
       }
@@ -59,6 +69,14 @@ function ResponsiveAppBar() {
   const handlePageItemClick = (event: React.MouseEvent<HTMLElement>) => {
     console.log(event);
   };
+
+  useEffect(() => {
+    if (profile.id === 0) {
+      setSettingList(settingsGuest);
+    } else {
+      setSettingList(settings);
+    }
+  }, [profile]);
 
   return (
     <AppBar position="static" color={"primary"}>
@@ -231,7 +249,7 @@ function ResponsiveAppBar() {
               transformOrigin={{ horizontal: "right", vertical: "top" }}
               anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
             >
-              {settings.map((setting) => (
+              {settingList.map((setting) => (
                 <MenuItem
                   key={setting}
                   onClick={() => handleCloseUserMenu(setting)}
@@ -242,6 +260,13 @@ function ResponsiveAppBar() {
                 </MenuItem>
               ))}
             </Menu>
+          </Box>
+          <Box sx={{ backgroundColor: "red" }}>
+            <AuthDialog
+              open={authModalOpen}
+              isLogin={isAuthLogin}
+              setOpen={setAuthModalOpen}
+            />
           </Box>
         </Toolbar>
       </Container>

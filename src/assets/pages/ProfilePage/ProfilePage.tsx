@@ -1,178 +1,133 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Box,
-  TextField,
-  Button,
+  Avatar,
   Typography,
   Card,
   CardContent,
-  Avatar,
+  Button,
+  Divider,
   IconButton,
+  Chip,
 } from "@mui/material";
 import { deepOrange } from "@mui/material/colors";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import { ProfileError } from "../../types/types";
-import { getProfile } from "../../api/Api";
+import EditIcon from "@mui/icons-material/Edit";
+import BadgeIcon from "@mui/icons-material/Verified";
 import { ProfileContext } from "../../contexts/ProfileContext";
+
+// Sample user data (replace with data from your API or props)
+const userData = {
+  name: "Jane Doe",
+  email: "janedoe@example.com",
+  joinDate: "2023-01-15",
+  description: "Avid reader, writer, and traveler. Loves technology and art.",
+  avatarUrl: "https://via.placeholder.com/150",
+  badges: ["Top Contributor", "Early Adopter", "Bookworm"],
+};
 
 const ProfilePage = () => {
   const { profile } = useContext(ProfileContext);
-  const [userData, setUserData] = useState(profile);
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
 
-  const [errors, setErrors] = useState<ProfileError>({});
+  const [editingDescription, setEditingDescription] = useState(false);
+  const [description, setDescription] = useState(userData.description);
 
-  const handleGetProfile = () => {
-    getProfile();
+  // Toggles edit mode for the description
+  const handleEditDescription = () => {
+    setEditingDescription(!editingDescription);
   };
 
-  // Handle input change for email, name, and password
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setUserData({ ...userData, [name]: value });
+  // Handles description change
+  const handleDescriptionChange = (event) => {
+    setDescription(event.target.value);
   };
 
-  // Handle password visibility toggle
-  const handleClickShowPassword = () => {
-    setShowPassword(!showPassword);
+  // Function to display join date in a readable format
+  const formatDate = (dateString: string) => {
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(dateString).toLocaleDateString(undefined, options);
   };
-
-  // Handle password input change
-  const handlePasswordChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "newPassword") {
-      setNewPassword(value);
-    } else {
-      setConfirmPassword(value);
-    }
-  };
-
-  // Validate the form before saving changes
-  const validateForm = () => {
-    const newErrors: ProfileError = {};
-
-    // Validate email format
-    if (!/\S+@\S+\.\S+/.test(userData.email)) {
-      newErrors.email = "Please enter a valid email address.";
-    }
-
-    // Validate password and confirm password match
-    if (newPassword && newPassword.length < 8) {
-      newErrors.password = "Password should be at least 8 characters.";
-    } else if (newPassword !== confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match.";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // Handle form submission for updating user information
-  const handleSubmit = (e) => {
-    console.log(typeof e);
-    e.preventDefault();
-    if (validateForm()) {
-      // Save changes logic (could be an API call)
-      console.log("User Data Updated:", { ...userData, password: newPassword });
-      alert("Profile updated successfully!");
-    }
-  };
-
-  useEffect(() => {
-    handleGetProfile();
-  }, []);
 
   return (
     <Box p={3} display="flex" justifyContent="center">
-      <Card sx={{ maxWidth: 500, width: "100%" }}>
+      <Card sx={{ maxWidth: 600, width: "100%" }}>
         <CardContent>
-          <Box display="flex" justifyContent="center" mb={3}>
-            <Avatar sx={{ bgcolor: deepOrange[500], width: 100, height: 100 }}>
-              {userData.name.charAt(0)}
-            </Avatar>
+          {/* User Avatar and Name */}
+          <Box display="flex" flexDirection="column" alignItems="center" mb={3}>
+            <Avatar
+              src={userData.avatarUrl}
+              alt={userData.name}
+              sx={{ width: 120, height: 120, bgcolor: deepOrange[500] }}
+            />
+            <Typography variant="h4" mt={2}>
+              {userData.name}
+            </Typography>
+            <Typography variant="body1" color="textSecondary">
+              {userData.email}
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              Joined on {formatDate(userData.joinDate)}
+            </Typography>
           </Box>
 
-          <Typography variant="h5" align="center" gutterBottom>
-            Edit Profile
-          </Typography>
+          <Divider sx={{ my: 3 }} />
 
-          <form onSubmit={handleSubmit}>
-            {/* Name */}
-            <TextField
-              fullWidth
-              label="Name"
-              name="name"
-              value={userData.name}
-              onChange={handleInputChange}
-              margin="normal"
-              variant="outlined"
-            />
-
-            {/* Email */}
-            <TextField
-              fullWidth
-              label="Email"
-              name="email"
-              value={userData.email}
-              onChange={handleInputChange}
-              margin="normal"
-              variant="outlined"
-              error={!!errors.email}
-              helperText={errors.email}
-            />
-
-            {/* Password (New Password) */}
-            <TextField
-              fullWidth
-              label="New Password"
-              name="newPassword"
-              value={newPassword}
-              onChange={handlePasswordChange}
-              margin="normal"
-              variant="outlined"
-              type={showPassword ? "text" : "password"}
-              error={!!errors.password}
-              helperText={errors.password}
-              InputProps={{
-                endAdornment: (
-                  <IconButton onClick={handleClickShowPassword}>
-                    {showPassword ? <Visibility /> : <VisibilityOff />}
-                  </IconButton>
-                ),
-              }}
-            />
-
-            {/* Confirm Password */}
-            <TextField
-              fullWidth
-              label="Confirm Password"
-              name="confirmPassword"
-              value={confirmPassword}
-              onChange={handlePasswordChange}
-              margin="normal"
-              variant="outlined"
-              type={showPassword ? "text" : "password"}
-              error={!!errors.confirmPassword}
-              helperText={errors.confirmPassword}
-              InputProps={{
-                endAdornment: (
-                  <IconButton onClick={handleClickShowPassword}>
-                    {showPassword ? <Visibility /> : <VisibilityOff />}
-                  </IconButton>
-                ),
-              }}
-            />
-
-            {/* Submit Button */}
-            <Box mt={3} display="flex" justifyContent="center">
-              <Button type="submit" variant="contained" color="primary">
-                Save Changes
-              </Button>
+          {/* Description Section */}
+          <Box mb={3}>
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
+            >
+              <Typography variant="h6">About Me</Typography>
+              <IconButton size="small" onClick={handleEditDescription}>
+                <EditIcon fontSize="small" />
+              </IconButton>
             </Box>
-          </form>
+            {editingDescription ? (
+              <Box>
+                <textarea
+                  rows={4}
+                  value={description}
+                  onChange={handleDescriptionChange}
+                  style={{ width: "100%", padding: "8px", fontSize: "16px" }}
+                />
+                <Box display="flex" justifyContent="flex-end" mt={1}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="small"
+                    onClick={() => setEditingDescription(false)}
+                  >
+                    Save
+                  </Button>
+                </Box>
+              </Box>
+            ) : (
+              <Typography variant="body1" mt={1}>
+                {description}
+              </Typography>
+            )}
+          </Box>
+
+          <Divider sx={{ my: 3 }} />
+
+          {/* Badges Section */}
+          <Box mb={3}>
+            <Typography variant="h6" gutterBottom>
+              Badges
+            </Typography>
+            <Box display="flex" flexWrap="wrap" gap={1}>
+              {userData.badges.map((badge, index) => (
+                <Chip
+                  key={index}
+                  label={badge}
+                  icon={<BadgeIcon />}
+                  color="primary"
+                  variant="outlined"
+                />
+              ))}
+            </Box>
+          </Box>
         </CardContent>
       </Card>
     </Box>

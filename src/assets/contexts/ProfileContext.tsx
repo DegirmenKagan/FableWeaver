@@ -10,6 +10,7 @@ type ProfileContextType = {
 export const ProfileContext = createContext<ProfileContextType>({
   profile: {
     id: 0,
+    createdAt: new Date(),
     username: "John Doe",
     name: "John Doe",
     avatar: "",
@@ -22,10 +23,11 @@ export const ProfileContext = createContext<ProfileContextType>({
 export const ProfileProvider = ({ children }: { children: JSX.Element }) => {
   const [profile, setProfile] = React.useState<User>({
     id: 0,
-    username: "John Doe",
+    createdAt: new Date(),
+    username: "johndoe123",
     name: "John Doe",
     avatar: "",
-    email: "",
+    email: "johndoe@fableweaver.com",
     password: "password123",
   });
 

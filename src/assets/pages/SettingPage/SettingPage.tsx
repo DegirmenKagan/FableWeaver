@@ -19,9 +19,12 @@ import { ProfileContext } from "../../contexts/ProfileContext";
 const SettingPage = () => {
   const { profile } = useContext(ProfileContext);
   const [userData, setUserData] = useState(profile);
+  const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [errors, setErrors] = useState<ProfileError>({});
 
@@ -36,27 +39,60 @@ const SettingPage = () => {
   };
 
   // Handle password visibility toggle
-  const handleClickShowPassword = () => {
-    setShowPassword(!showPassword);
+  const handleClickShowPassword = (name: string) => {
+    switch (name) {
+      case "oldPassword":
+        setShowOldPassword(!showOldPassword);
+        break;
+      case "newPassword":
+        setShowNewPassword(!showNewPassword);
+        break;
+      case "confirmPassword":
+        setShowConfirmPassword(!showConfirmPassword);
+        break;
+      default:
+        break;
+    }
   };
 
   // Handle password input change
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
-    if (name === "newPassword") {
-      setNewPassword(value);
-    } else {
-      setConfirmPassword(value);
+    switch (name) {
+      case "oldPassword":
+        setOldPassword(value);
+        break;
+      case "newPassword":
+        setNewPassword(value);
+        break;
+      case "confirmPassword":
+        setConfirmPassword(value);
+        break;
+      default:
+        break;
     }
   };
 
   // Validate the form before saving changes
   const validateForm = () => {
     const newErrors: ProfileError = {};
+    //validate username
+    if (!userData.username) {
+      newErrors.username = "Please enter a username.";
+    }
+    // Validate name
+    if (!userData.name) {
+      newErrors.name = "Please enter your name.";
+    }
 
     // Validate email format
     if (!/\S+@\S+\.\S+/.test(userData.email)) {
       newErrors.email = "Please enter a valid email address.";
+    }
+
+    // Validate old password
+    if (!oldPassword) {
+      newErrors.oldPassword = "Please enter your old password.";
     }
 
     // Validate password and confirm password match
@@ -82,7 +118,7 @@ const SettingPage = () => {
   };
 
   useEffect(() => {
-    handleGetProfile();
+    // handleGetProfile();
   }, []);
 
   return (
@@ -100,6 +136,19 @@ const SettingPage = () => {
           </Typography>
 
           <form onSubmit={handleSubmit}>
+            {/* Username */}
+            <TextField
+              fullWidth
+              label="Username"
+              name="username"
+              value={userData.username}
+              onChange={handleInputChange}
+              margin="normal"
+              variant="outlined"
+              error={!!errors.username}
+              helperText={errors.username}
+            />
+
             {/* Name */}
             <TextField
               fullWidth
@@ -109,6 +158,8 @@ const SettingPage = () => {
               onChange={handleInputChange}
               margin="normal"
               variant="outlined"
+              error={!!errors.name}
+              helperText={errors.name}
             />
 
             {/* Email */}
@@ -124,6 +175,29 @@ const SettingPage = () => {
               helperText={errors.email}
             />
 
+            {/* Password (Old Password) */}
+            <TextField
+              fullWidth
+              label="Old Password"
+              name="oldPassword"
+              value={oldPassword}
+              onChange={handlePasswordChange}
+              margin="normal"
+              variant="outlined"
+              type={showOldPassword ? "text" : "password"}
+              error={!!errors.oldPassword}
+              helperText={errors.oldPassword}
+              InputProps={{
+                endAdornment: (
+                  <IconButton
+                    onClick={() => handleClickShowPassword("oldPassword")}
+                  >
+                    {showOldPassword ? <Visibility /> : <VisibilityOff />}
+                  </IconButton>
+                ),
+              }}
+            />
+
             {/* Password (New Password) */}
             <TextField
               fullWidth
@@ -133,13 +207,15 @@ const SettingPage = () => {
               onChange={handlePasswordChange}
               margin="normal"
               variant="outlined"
-              type={showPassword ? "text" : "password"}
+              type={showNewPassword ? "text" : "password"}
               error={!!errors.password}
               helperText={errors.password}
               InputProps={{
                 endAdornment: (
-                  <IconButton onClick={handleClickShowPassword}>
-                    {showPassword ? <Visibility /> : <VisibilityOff />}
+                  <IconButton
+                    onClick={() => handleClickShowPassword("newPassword")}
+                  >
+                    {showNewPassword ? <Visibility /> : <VisibilityOff />}
                   </IconButton>
                 ),
               }}
@@ -154,13 +230,15 @@ const SettingPage = () => {
               onChange={handlePasswordChange}
               margin="normal"
               variant="outlined"
-              type={showPassword ? "text" : "password"}
+              type={showConfirmPassword ? "text" : "password"}
               error={!!errors.confirmPassword}
               helperText={errors.confirmPassword}
               InputProps={{
                 endAdornment: (
-                  <IconButton onClick={handleClickShowPassword}>
-                    {showPassword ? <Visibility /> : <VisibilityOff />}
+                  <IconButton
+                    onClick={() => handleClickShowPassword("confirmPassword")}
+                  >
+                    {showConfirmPassword ? <Visibility /> : <VisibilityOff />}
                   </IconButton>
                 ),
               }}
