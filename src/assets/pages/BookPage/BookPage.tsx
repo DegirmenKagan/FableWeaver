@@ -3,8 +3,8 @@ import { Box, Typography, Rating, Divider } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { Book } from "../../types/types";
 import { emptyBook } from "../PaperPages/PaperPage.functions";
-import { doGetBookInfo } from "./BookPage.functions";
 import BookComments from "./BookComments/BookComments";
+import { doGetBook } from "./BookPage.functions";
 
 const BookPage = () => {
   const { bookId } = useParams();
@@ -24,7 +24,7 @@ const BookPage = () => {
     if (bookId) {
       const validId = parseInt(bookId);
       if (validId > 0) {
-        doGetBookInfo(validId, setBook);
+        doGetBook(validId, setBook);
       }
     }
   }, [bookId]);
@@ -36,7 +36,7 @@ const BookPage = () => {
         {/* Book Cover */}
         <Box flex="1">
           <img
-            src={book.img}
+            src={book.image}
             alt={book.title}
             style={{ width: "100%", height: "auto" }}
           />

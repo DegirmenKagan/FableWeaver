@@ -37,6 +37,7 @@ const LibraryPage = () => {
   const [books, setBooks] = useState<Book[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [view, setView] = useState("grid"); // Toggle between 'list' and 'grid'
+  const CARDHEIGHT = 175;
 
   useEffect(() => {
     if (books.length === 0) getLibraryBooks(setBooks);
@@ -89,7 +90,10 @@ const LibraryPage = () => {
             }
             mb={2}
           >
-            <Card sx={{ display: "flex" }} variant="outlined">
+            <Card
+              sx={{ display: "flex", height: CARDHEIGHT }}
+              variant="outlined"
+            >
               <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
                 <CardContent>
                   <Typography variant="h6">{book.title}</Typography>
@@ -124,7 +128,12 @@ const LibraryPage = () => {
               </Box>
               <CardMedia
                 component="img"
-                sx={{ width: 140, objectFit: "contain" }}
+                sx={{
+                  width: 140,
+                  maxHeight: CARDHEIGHT,
+                  objectFit: "contain",
+                  alignSelf: "center",
+                }}
                 image={book.image}
                 alt={book.title}
               />

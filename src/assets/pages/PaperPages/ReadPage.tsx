@@ -7,11 +7,9 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import "@mdxeditor/editor/style.css";
 import { MDXEditor } from "@mdxeditor/editor";
 import { useParams } from "react-router-dom";
-import { Book } from "../../types/types";
+import { BookChapter } from "../../types/types";
 import {
-  chapters,
-  doGetBook,
-  emptyBook,
+  doGetBookChaptersByBookId,
   handleChapterClick,
   handleNextPage,
   handlePrevPage,
@@ -22,10 +20,10 @@ const ReadPage = () => {
   // State to manage the current page and underlined text
 
   const [currentPage, setCurrentPage] = useState(0);
-  const [markdown, setMarkdown] = useState<string>(chapters[0]?.content);
+  const [markdown, setMarkdown] = useState<string>("-1"); // chapters[0]?.content
   const { bookId } = useParams();
 
-  const [book, setBook] = useState<Book>(emptyBook);
+  const [chapters, setChapters] = useState<BookChapter[]>([]);
 
   useEffect(() => {
     if (currentPage >= 0 && currentPage < chapters.length) {
@@ -44,16 +42,16 @@ const ReadPage = () => {
 
   // Effect to set initial content on mount
   useEffect(() => {
-    if (markdown !== "-1") {
+    if (chapters.length > 0 && markdown !== "-1") {
       chapters[currentPage ?? 0].content = markdown;
     }
-  }, [markdown]); // Only run once on mount
+  }, [chapters]); // Only run once on mount
 
   useEffect(() => {
     if (bookId) {
       const validId = parseInt(bookId);
       if (validId > 0) {
-        doGetBook(validId, setBook);
+        doGetBookChaptersByBookId(validId, setChapters);
       }
     }
   }, [bookId]);

@@ -1,8 +1,9 @@
+import { getBookChaptersByBookId } from "../../api/BookChapterService";
 import { Book, BookChapter } from "../../types/types";
 
 export const emptyBook: Book = {
   id: 0,
-  img: "",
+  image: "",
   title: "",
   description: "",
   author: "",
@@ -15,35 +16,29 @@ export const chapters: BookChapter[] = [
   // Dummy chapters for the chapter tree
   {
     id: 1,
+    bookId: 1,
     title: "Chapter 1: Introduction",
     content: "This is the first chapter",
   },
   {
     id: 2,
+    bookId: 2,
     title: "Chapter 2: The Journey",
     content: "This is the second chapter",
   },
   {
     id: 3,
+    bookId: 3,
     title: "Chapter 3: Challenges Ahead",
     content: "This is the third chapter",
   },
   {
     id: 4,
+    bookId: 4,
     title: "Chapter 4: The Climax",
     content: "This is the fourth chapter",
   },
 ];
-
-export const doGetBook = async (
-  bookId: number,
-  setBook: React.Dispatch<React.SetStateAction<Book>>
-) => {
-  const response = await fetch(`http://localhost:3000/book/${bookId}`);
-  const data = await response.json();
-  console.log(data);
-  setBook(data);
-};
 
 // Function to handle next page
 export const handleNextPage = (
@@ -86,11 +81,13 @@ export const handleEdit = (
   }, 50);
 };
 export const handleNewPage = (
+  bookId: number,
   chapters: BookChapter[],
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>
 ) => {
-  const newChapter = {
+  const newChapter: BookChapter = {
     id: chapters.length + 1,
+    bookId: bookId,
     title: `Chapter ${chapters.length + 1}: New Chapter`,
     content: "This is a new chapter",
   };
@@ -124,4 +121,16 @@ export const doSaveBook = async (book: Book) => {
   });
   const data = await response.json();
   console.log(data);
+};
+
+export const doGetBookChaptersByBookId = async (
+  bookId: number,
+  setChapters: React.Dispatch<React.SetStateAction<BookChapter[]>>
+) => {
+  const response = await getBookChaptersByBookId(bookId);
+  if (response) {
+    setChapters(response);
+  } else {
+    console.log(`Error fetching BookChapters with bookId: ${bookId}`);
+  }
 };

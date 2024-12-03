@@ -49,10 +49,18 @@ export type BookRating = {
   rating: number;
 };
 
-export type Comment = {
+export type IComment = {
+  id: number;
+  text: string;
+  bookId: number;
+  userId?: number;
+};
+
+export type ICommentDto = {
   id: number;
   bookId: number;
+  userId?: number;
   username: string;
   text: string;
-  avatar: string;
+  avatar?: string;
 };

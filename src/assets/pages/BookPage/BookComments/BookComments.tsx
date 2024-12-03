@@ -12,62 +12,77 @@ import {
   ListItemAvatar,
   ListItemText,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { deepPurple } from "@mui/material/colors";
-import { Comment } from "../../../types/types";
+import { IComment, ICommentDto } from "../../../types/types";
+import { doAddComment, doGetBookComments } from "./BookComments.functions";
 
 // Dummy comments for the book
-const initialComments: Comment[] = [
-  {
-    id: 1,
-    bookId: 1,
-    username: "John Doe",
-    text: "Amazing book! The writing style is fantastic.",
-    avatar: "",
-  },
-  {
-    id: 2,
-    bookId: 1,
-    username: "Jane Smith",
-    text: "The ending left me speechless.",
-    avatar: "",
-  },
-];
+// const initialComments: IComment[] = [
+//   {
+//     id: 1,
+//     bookId: 1,
+//     username: "John Doe",
+//     text: "Amazing book! The writing style is fantastic.",
+//     avatar: "",
+//   },
+//   {
+//     id: 2,
+//     bookId: 1,
+//     username: "Jane Smith",
+//     text: "The ending left me speechless.",
+//     avatar: "",
+//   },
+// ];
 
 type Props = {
   bookId: number;
 };
 
 const BookComments = (props: Props) => {
-  const [comments, setComments] = useState(initialComments);
+  const [comments, setComments] = useState<ICommentDto[]>([]);
   const [newComment, setNewComment] = useState("");
 
-  const getComments = () => {
-    // Fetch comments from the server
-    // setComments();
+  const getComments = (bookId: number) => {
+    doGetBookComments(bookId, setComments);
   };
 
-  const addComment = async (comment: Comment) => {
-    // Add the comment to the server
+  const addComment = async (comment: IComment) => {
+    doAddComment(comment);
   };
 
   // Function to handle adding a new comment
   const handleAddComment = () => {
     if (newComment.trim() !== "") {
-      const comment: Comment = {
+      const comment: IComment = {
         id: comments.length + 1,
         bookId: props.bookId,
-        username: "Anonymous", // For now, the name is static, can be dynamic based on user data
+        userId: undefined, // FIXME: profile.id ?? undefined,
         text: newComment,
-        avatar: "", // Could be dynamic if the user has an avatar
       };
 
       addComment(comment);
 
-      setComments([comment, ...comments]);
+      const localComment: ICommentDto = {
+        id: comment.id,
+        bookId: comment.id,
+        userId: comment.userId, // FIXME: profile.avatar ?? undefined,
+        username: "Anonim", // FIXME: profile.username ?? "Anonim"
+        text: comment.text,
+        avatar: undefined, // FIXME: profile.avatar ?? undefined,
+      };
+
+      setComments([localComment, ...comments]);
       setNewComment("");
     }
   };
+
+  useEffect(() => {
+    if (props.bookId) {
+      getComments(props.bookId);
+    }
+  }, [props.bookId]);
+
   return (
     <Box>
       <Typography variant="h5" gutterBottom>
@@ -107,7 +122,7 @@ const BookComments = (props: Props) => {
           <ListItem key={comment.id} alignItems="flex-start">
             <ListItemAvatar>
               <Avatar sx={{ bgcolor: deepPurple[500] }}>
-                {comment.username.charAt(0)}
+                {comment.username ? comment.username.charAt(0) : "A"}
               </Avatar>
             </ListItemAvatar>
             <ListItemText

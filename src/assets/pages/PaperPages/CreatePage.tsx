@@ -20,7 +20,6 @@ import { Book } from "../../types/types";
 import { useParams } from "react-router-dom";
 import {
   chapters,
-  doGetBook,
   doSaveBook,
   emptyBook,
   handleChapterClick,
@@ -31,6 +30,7 @@ import {
   handlePrevPage,
 } from "./PaperPage.functions";
 import { StyledPaper } from "../../components/StyledPaper";
+import { doGetBook } from "../BookPage/BookPage.functions";
 
 const CreatePage = () => {
   // State to manage the current page and underlined text
@@ -172,7 +172,7 @@ const CreatePage = () => {
           <Button
             variant="contained"
             startIcon={<NoteAdd />}
-            onClick={() => handleNewPage(chapters, setCurrentPage)}
+            onClick={() => handleNewPage(book.id, chapters, setCurrentPage)}
             disabled={editMode === 0} // add the "if user is not an editor"
           >
             Add Page

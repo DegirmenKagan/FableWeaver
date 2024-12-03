@@ -26,6 +26,24 @@ export const getBooks = async () => {
   }
 };
 
+export const getBook = async (id: number) => {
+  try {
+    const { data, error } = await apiClient
+      .from("Book")
+      .select("*")
+      .eq("id", id)
+      .single();
+    if (error) {
+      throw error;
+    }
+    const bookChapter = data as Book;
+    return bookChapter;
+  } catch (error) {
+    console.error("getBook", error);
+    return null;
+  }
+};
+
 export const getBookInfos = async () => {
   try {
     const { data, error } = await apiClient.from("Book").select("*");
