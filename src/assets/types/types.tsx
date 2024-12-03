@@ -51,6 +51,8 @@ export type BookRating = {
 
 export type IComment = {
   id: number;
+  createdAt?: Date;
+  updatedAt?: Date;
   text: string;
   bookId: number;
   userId?: number;
@@ -58,6 +60,8 @@ export type IComment = {
 
 export type ICommentDto = {
   id: number;
+  createdAt?: Date;
+  updatedAt?: Date;
   bookId: number;
   userId?: number;
   username: string;

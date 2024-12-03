@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import { deepPurple } from "@mui/material/colors";
 import { IComment, ICommentDto } from "../../../types/types";
 import { doAddComment, doGetBookComments } from "./BookComments.functions";
+import { dateFormat } from "../../../components/StringFormat";
 
 // Dummy comments for the book
 // const initialComments: IComment[] = [
@@ -65,6 +66,8 @@ const BookComments = (props: Props) => {
 
       const localComment: ICommentDto = {
         id: comment.id,
+        createdAt: comment.createdAt,
+        updatedAt: comment.updatedAt,
         bookId: comment.id,
         userId: comment.userId, // FIXME: profile.avatar ?? undefined,
         username: "Anonim", // FIXME: profile.username ?? "Anonim"
@@ -119,18 +122,25 @@ const BookComments = (props: Props) => {
       {/* List of Comments */}
       <List>
         {comments.map((comment) => (
-          <ListItem key={comment.id} alignItems="flex-start">
+          <ListItem
+            sx={{ display: "flex", flexDirection: "row" }}
+            key={comment.id}
+            alignItems="flex-start"
+          >
             <ListItemAvatar>
               <Avatar sx={{ bgcolor: deepPurple[500] }}>
                 {comment.username ? comment.username.charAt(0) : "A"}
               </Avatar>
             </ListItemAvatar>
             <ListItemText
-              primary={comment.username}
+              primary={comment.username ?? "Anonim"}
               secondary={
                 <Typography variant="body2">{comment.text}</Typography>
               }
             />
+            <Typography sx={{ marginTop: 0.8 }}>
+              {dateFormat(comment.updatedAt ?? comment.createdAt)}
+            </Typography>
           </ListItem>
         ))}
       </List>
