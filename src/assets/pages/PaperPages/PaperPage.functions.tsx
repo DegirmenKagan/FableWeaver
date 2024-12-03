@@ -1,4 +1,4 @@
-import { Book, Chapter } from "../../types/types";
+import { Book, BookChapter } from "../../types/types";
 
 export const emptyBook: Book = {
   id: 0,
@@ -11,7 +11,7 @@ export const emptyBook: Book = {
   favorite: false,
 };
 
-export const chapters: Chapter[] = [
+export const chapters: BookChapter[] = [
   // Dummy chapters for the chapter tree
   {
     id: 1,
@@ -49,7 +49,7 @@ export const doGetBook = async (
 export const handleNextPage = (
   currentPage: number,
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>,
-  chapters: Chapter[]
+  chapters: BookChapter[]
 ) => {
   if (currentPage < chapters.length - 1) {
     setCurrentPage(currentPage + 1);
@@ -86,7 +86,7 @@ export const handleEdit = (
   }, 50);
 };
 export const handleNewPage = (
-  chapters: Chapter[],
+  chapters: BookChapter[],
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>
 ) => {
   const newChapter = {
@@ -99,7 +99,7 @@ export const handleNewPage = (
 };
 
 export const handleDeletePage = (
-  chapters: Chapter[],
+  chapters: BookChapter[],
   currentPage: number,
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>
 ) => {

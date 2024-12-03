@@ -1,18 +1,5 @@
 import { apiClient } from "../utils/supabase";
 
-export const getProfile = async () => {
-  try {
-    const { data, error } = await apiClient.from("User").select("*").single();
-    if (error) {
-      throw error;
-    }
-    return data;
-  } catch (error) {
-    console.error("getProfile", error);
-    return null;
-  }
-};
-
 export const login = async (email: string, password: string) => {
   try {
     const { data, error } = await apiClient.auth.signInWithPassword({

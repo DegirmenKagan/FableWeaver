@@ -13,8 +13,8 @@ import { deepOrange } from "@mui/material/colors";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { ProfileError } from "../../types/types";
-import { getProfile } from "../../api/Api";
 import { ProfileContext } from "../../contexts/ProfileContext";
+import { getProfile } from "../../api/UserService";
 
 const SettingPage = () => {
   const { profile } = useContext(ProfileContext);

@@ -7,6 +7,11 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useEffect } from "react";
+import { register } from "../api/Api";
+import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from "@mui/material/IconButton";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import Input from "@mui/material/Input";
 
 type AuthDialogProps = {
   open: boolean;
@@ -18,6 +23,21 @@ type AuthDialogProps = {
 export default function AuthDialog(props: AuthDialogProps) {
   const { open, setOpen } = props;
   const [isLogin, setIsLogin] = React.useState(false);
+  const [showPassword, setShowPassword] = React.useState(false);
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+  };
+
+  const handleMouseUpPassword = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+  };
 
   const handleClose = () => {
     setOpen(false);
@@ -27,7 +47,7 @@ export default function AuthDialog(props: AuthDialogProps) {
     setIsLogin(!isLogin);
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const formJson = Object.fromEntries(formData.entries());
@@ -38,8 +58,21 @@ export default function AuthDialog(props: AuthDialogProps) {
       // Implement login functionality here
     } else {
       const { email, password, confirmPassword } = formJson;
+      if (password !== confirmPassword) {
+        alert("Passwords do not match.");
+        return;
+      }
       console.log("Register data:", { email, password, confirmPassword });
-      // Implement registration functionality here
+
+      const registeredUser = await register(
+        email.toString(),
+        password.toString()
+      );
+      if (registeredUser?.email) {
+        alert(`Registration successful. Welcome, ${registeredUser.email}!`);
+      } else {
+        alert("Registration failed.");
+      }
     }
 
     handleClose();
@@ -79,27 +112,53 @@ export default function AuthDialog(props: AuthDialogProps) {
             fullWidth
             variant="standard"
           />
-          <TextField
-            required
-            margin="dense"
+          <Input
             id="password"
             name="password"
-            label="Password"
-            type="password"
+            margin="dense"
             fullWidth
-            variant="standard"
+            type={showPassword ? "text" : "password"}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label={
+                    showPassword ? "hide the password" : "display the password"
+                  }
+                  onClick={handleClickShowPassword}
+                  onMouseDown={handleMouseDownPassword}
+                  onMouseUp={handleMouseUpPassword}
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            }
           />
-          {!isLogin && (
-            <TextField
-              required
-              margin="dense"
+          {!isLogin ? (
+            <Input
               id="confirmPassword"
               name="confirmPassword"
-              label="Confirm Password"
-              type="password"
+              margin="dense"
               fullWidth
-              variant="standard"
+              type={showPassword ? "text" : "password"}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label={
+                      showPassword
+                        ? "hide the password"
+                        : "display the password"
+                    }
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                    onMouseUp={handleMouseUpPassword}
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              }
             />
+          ) : (
+            <></>
           )}
         </DialogContent>
         <DialogActions>

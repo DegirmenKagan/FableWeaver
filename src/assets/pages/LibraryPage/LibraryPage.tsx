@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -10,6 +10,7 @@ import {
   TextField,
   ToggleButton,
   ToggleButtonGroup,
+  CardMedia,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -27,15 +28,19 @@ import {
   editBook,
   deleteBook,
   handleNewBookClick,
-  initialBooks,
+  getLibraryBooks,
 } from "./LibraryPage.functions";
 import { Book } from "../../types/types";
 
 const LibraryPage = () => {
   const navigate = useNavigate();
-  const [books, setBooks] = useState<Book[]>(initialBooks);
+  const [books, setBooks] = useState<Book[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [view, setView] = useState("grid"); // Toggle between 'list' and 'grid'
+
+  useEffect(() => {
+    if (books.length === 0) getLibraryBooks(setBooks);
+  }, [books]);
 
   return (
     <Box p={3}>
@@ -84,37 +89,45 @@ const LibraryPage = () => {
             }
             mb={2}
           >
-            <Card variant="outlined">
-              <CardContent>
-                <Typography variant="h6">{book.title}</Typography>
-                <Typography variant="subtitle2" color="textSecondary">
-                  Author: {book.author}
-                </Typography>
-              </CardContent>
-              <CardActions>
-                {/* Favorite Button */}
-                <IconButton
-                  onClick={() => toggleFavorite(book.id, books, setBooks)}
-                >
-                  <FavoriteIcon
-                    color={book.favorite ? "secondary" : "inherit"}
-                  />
-                </IconButton>
-                {/* Open Button */}
-                <IconButton onClick={() => openBook(book.id, navigate)}>
-                  <OpenInNewIcon />
-                </IconButton>
-                {/* Edit Button */}
-                <IconButton onClick={() => editBook(book.id, navigate)}>
-                  <EditIcon />
-                </IconButton>
-                {/* Delete Button */}
-                <IconButton
-                  onClick={() => deleteBook(book.id, books, setBooks)}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </CardActions>
+            <Card sx={{ display: "flex" }} variant="outlined">
+              <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
+                <CardContent>
+                  <Typography variant="h6">{book.title}</Typography>
+                  <Typography variant="subtitle2" color="textSecondary">
+                    Author: {book.author}
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  {/* Favorite Button */}
+                  <IconButton
+                    onClick={() => toggleFavorite(book.id, books, setBooks)}
+                  >
+                    <FavoriteIcon
+                      color={book.favorite ? "secondary" : "inherit"}
+                    />
+                  </IconButton>
+                  {/* Open Button */}
+                  <IconButton onClick={() => openBook(book.id, navigate)}>
+                    <OpenInNewIcon />
+                  </IconButton>
+                  {/* Edit Button */}
+                  <IconButton onClick={() => editBook(book.id, navigate)}>
+                    <EditIcon />
+                  </IconButton>
+                  {/* Delete Button */}
+                  <IconButton
+                    onClick={() => deleteBook(book.id, books, setBooks)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </CardActions>
+              </Box>
+              <CardMedia
+                component="img"
+                sx={{ width: 140, objectFit: "contain" }}
+                image={book.image}
+                alt={book.title}
+              />
             </Card>
           </Box>
         ))}

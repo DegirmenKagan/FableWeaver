@@ -17,21 +17,23 @@ export type ProfileError = {
   confirmPassword?: string;
 };
 
-export type Chapter = {
+export type BookChapter = {
   id: number;
+  createdAt?: Date;
+  bookId: number;
   title: string;
   content: string;
 };
 
 export type Book = {
   id: number;
-  img: string;
+  image: string;
   title: string;
   description: string;
   author: string;
   rating?: number;
   favorite: boolean;
-  chapters: Chapter[];
+  chapters: BookChapter[];
 };
 
 export type BookFavorite = {

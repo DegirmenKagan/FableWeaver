@@ -1,5 +1,6 @@
 import { NavigateFunction } from "react-router-dom";
 import { Book } from "../../types/types";
+import { getBooks } from "../../api/BookService";
 
 export const initialBooks: Book[] = [
   {
@@ -111,4 +112,16 @@ export const handleViewChange = (
 
 export const handleNewBookClick = (navigate: NavigateFunction) => {
   navigate("/create/0");
+};
+
+export const getLibraryBooks = async (
+  setBooks: React.Dispatch<React.SetStateAction<Book[]>>
+) => {
+  const response = await getBooks();
+  if (response) {
+    console.log("Fetched books:", response);
+    setBooks(response);
+  } else {
+    console.log("Error fetching books");
+  }
 };
