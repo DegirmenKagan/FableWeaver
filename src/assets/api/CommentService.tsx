@@ -1,4 +1,4 @@
-import { IComment } from "../types/types";
+import { IComment, ICommentDto } from "../types/types";
 import { apiClient } from "../utils/supabase";
 
 export const getCommentsByBookId = async (bookId: number) => {
@@ -11,7 +11,7 @@ export const getCommentsByBookId = async (bookId: number) => {
       throw error;
     }
     console.log("getCommentsByBookId", data);
-    const user = data as IComment[];
+    const user = data as ICommentDto[];
     return user;
   } catch (error) {
     console.error("getCommentsByBookId", error);
