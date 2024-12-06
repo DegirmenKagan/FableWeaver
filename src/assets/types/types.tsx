@@ -43,7 +43,7 @@ export type BookFavorite = {
 };
 
 export type BookRating = {
-  id: number;
+  id?: number;
   bookId: number;
   userId: number;
   rating: number;

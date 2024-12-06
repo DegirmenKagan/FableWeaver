@@ -1,35 +1,36 @@
 //profileContext
 import React, { createContext } from "react";
-import { User } from "../types/types";
+import { IUserDto } from "../api/UserService";
 
 type ProfileContextType = {
-  profile: User;
-  setProfile: React.Dispatch<React.SetStateAction<User>>;
+  profile: IUserDto;
+  setProfile: React.Dispatch<React.SetStateAction<IUserDto>>;
 };
 
 export const ProfileContext = createContext<ProfileContextType>({
   profile: {
-    id: 0,
-    createdAt: new Date(),
-    username: "John Doe",
-    name: "John Doe",
+    id: 1,
+    created_at: new Date().toISOString(),
+    username: "Guest",
+    name: "Guest User",
     avatar: "",
     email: "",
-    password: "password123",
+    // password: "password123",
   },
   setProfile: () => {},
 });
 
 export const ProfileProvider = ({ children }: { children: JSX.Element }) => {
-  const [profile, setProfile] = React.useState<User>({
-    id: 0,
-    createdAt: new Date(),
-    username: "johndoe123",
-    name: "John Doe",
+  const guestUser = {
+    id: 1,
+    created_at: new Date().toISOString(),
+    username: "Guest",
+    name: "Guest User",
     avatar: "",
-    email: "johndoe@fableweaver.com",
-    password: "password123",
-  });
+    email: "",
+  };
+
+  const [profile, setProfile] = React.useState<IUserDto>(guestUser);
 
   return (
     <ProfileContext.Provider value={{ profile, setProfile }}>

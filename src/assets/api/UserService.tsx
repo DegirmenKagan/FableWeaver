@@ -10,9 +10,13 @@ export type IUserDto = {
   avatar: string;
 };
 
-export const getProfile = async () => {
+export const getProfile = async (userId: number) => {
   try {
-    const { data, error } = await apiClient.from("User").select("*").single();
+    const { data, error } = await apiClient
+      .from("User")
+      .select("*")
+      .eq("id", userId)
+      .single();
     if (error) {
       throw error;
     }
@@ -20,6 +24,6 @@ export const getProfile = async () => {
     return user;
   } catch (error) {
     console.error("getProfile", error);
-    return null;
+    return undefined;
   }
 };

@@ -12,11 +12,12 @@ import {
   ListItemAvatar,
   ListItemText,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { deepPurple } from "@mui/material/colors";
 import { IComment, ICommentDto } from "../../../types/types";
 import { doAddComment, doGetBookComments } from "./BookComments.functions";
 import { dateFormat } from "../../../components/StringFormat";
+import { ProfileContext } from "../../../contexts/ProfileContext";
 
 // Dummy comments for the book
 // const initialComments: IComment[] = [
@@ -43,6 +44,7 @@ type Props = {
 const BookComments = (props: Props) => {
   const [comments, setComments] = useState<ICommentDto[]>([]);
   const [newComment, setNewComment] = useState("");
+  const { profile } = useContext(ProfileContext);
 
   const getComments = (bookId: number) => {
     doGetBookComments(bookId, setComments);
@@ -58,7 +60,7 @@ const BookComments = (props: Props) => {
       const comment: IComment = {
         id: comments.length + 1,
         bookId: props.bookId,
-        userId: undefined, // FIXME: profile.id ?? undefined,
+        userId: profile.id,
         text: newComment,
       };
 
@@ -70,7 +72,7 @@ const BookComments = (props: Props) => {
         updatedAt: comment.updatedAt,
         bookId: comment.id,
         userId: comment.userId, // FIXME: profile.avatar ?? undefined,
-        username: "Anonim", // FIXME: profile.username ?? "Anonim"
+        username: profile.username, // FIXME: profile.username ?? "Anonim"
         text: comment.text,
         avatar: undefined, // FIXME: profile.avatar ?? undefined,
       };
@@ -129,11 +131,11 @@ const BookComments = (props: Props) => {
           >
             <ListItemAvatar>
               <Avatar sx={{ bgcolor: deepPurple[500] }}>
-                {comment.username ? comment.username.charAt(0) : "A"}
+                {comment.username ? comment.username.charAt(0) : undefined}
               </Avatar>
             </ListItemAvatar>
             <ListItemText
-              primary={comment.username ?? "Anonim"}
+              primary={comment.username ?? "Guest"}
               secondary={
                 <Typography variant="body2">{comment.text}</Typography>
               }

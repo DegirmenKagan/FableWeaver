@@ -4,11 +4,16 @@ import { useParams } from "react-router-dom";
 import { Book } from "../../types/types";
 import { emptyBook } from "../PaperPages/PaperPage.functions";
 import BookComments from "./BookComments/BookComments";
-import { doGetBook } from "./BookPage.functions";
+import {
+  doGetBook,
+  doGetBookRating,
+  doAddUserRating,
+} from "./BookPage.functions";
 
 const BookPage = () => {
   const { bookId } = useParams();
   const [book, setBook] = useState<Book>(emptyBook);
+  const [bookRating, setBookRating] = useState<number>(0);
 
   const [userRating, setUserRating] = useState(0);
 
@@ -25,9 +30,17 @@ const BookPage = () => {
       const validId = parseInt(bookId);
       if (validId > 0) {
         doGetBook(validId, setBook);
+        doGetBookRating(validId, setBookRating);
       }
     }
   }, [bookId]);
+
+  useEffect(() => {
+    if (userRating > 0) {
+      console.log("User Rating CHANGED", userRating);
+      doAddUserRating(userRating, book.id, 1, setBookRating);
+    }
+  }, [userRating]);
 
   return (
     <Box p={3}>
@@ -57,11 +70,11 @@ const BookPage = () => {
           {/* Star Rating */}
           <Box display="flex" alignItems="center" mb={2}>
             <Typography variant="h6" mr={1}>
-              Rating: {book.rating}
+              Rating:
             </Typography>
             <Rating
               name="read-only"
-              value={book.rating}
+              value={bookRating}
               precision={0.5}
               readOnly
             />
