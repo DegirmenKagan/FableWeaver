@@ -19,7 +19,7 @@ export const getBookChaptersByBookId = async (bookId: number) => {
   }
 };
 
-export const getBookChapterById = async (id: number) => {
+export const getBookChapterByChapterId = async (id: number) => {
   try {
     const { data, error } = await apiClient
       .from("BookChapter")

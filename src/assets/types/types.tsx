@@ -23,6 +23,7 @@ export type BookChapter = {
   bookId: number;
   title: string;
   content: string;
+  chapterId: number;
 };
 
 export type Book = {

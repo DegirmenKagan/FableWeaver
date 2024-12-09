@@ -70,21 +70,3 @@ export const addBookInfo = async (book: IBookInfoDto) => {
     return null;
   }
 };
-
-export const getBookChapter = async (id: number) => {
-  try {
-    const { data, error } = await apiClient
-      .from("BookChapter")
-      .select("*")
-      .eq("id", id)
-      .single();
-    if (error) {
-      throw error;
-    }
-    const bookChapter = data as BookChapter;
-    return bookChapter;
-  } catch (error) {
-    console.error("getBookChapter", error);
-    return null;
-  }
-};

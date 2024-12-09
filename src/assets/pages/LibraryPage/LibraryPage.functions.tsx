@@ -2,46 +2,46 @@ import { NavigateFunction } from "react-router-dom";
 import { Book } from "../../types/types";
 import { getBooks } from "../../api/BookService";
 
-export const initialBooks: Book[] = [
-  {
-    id: 1,
-    img: "",
-    title: "The Great Gatsby",
-    description:
-      "The Great Gatsby is a novel by American writer F. Scott Fitzgerald. Set in the Jazz Age on Long Island, near New York City, the novel depicts first-person narrator Nick Carraway's interactions with mysterious millionaire Jay Gatsby and Gatsby's obsession to reunite with his former lover, Daisy Buchanan.",
-    author: "F. Scott Fitzgerald",
-    favorite: false,
-    chapters: [],
-  },
-  {
-    id: 2,
-    img: "",
-    title: "1984",
-    description:
-      "1984 is a dystopian social science fiction novel by English novelist George Orwell. It was published on 8 June 1949 by Secker & Warburg as Orwell's ninth and final book completed in his lifetime.",
-    author: "George Orwell",
-    favorite: true,
-    chapters: [],
-  },
-  {
-    id: 3,
-    img: "",
-    title: "Moby Dick",
-    description: "Moby Dick",
-    author: "Herman Melville",
-    favorite: false,
-    chapters: [],
-  },
-  {
-    id: 4,
-    img: "",
-    title: "To Kill a Mockingbird",
-    description: "aaaaa",
-    author: "Harper Lee",
-    favorite: false,
-    chapters: [],
-  },
-];
+// export const initialBooks: Book[] = [
+//   {
+//     id: 1,
+//     img: "",
+//     title: "The Great Gatsby",
+//     description:
+//       "The Great Gatsby is a novel by American writer F. Scott Fitzgerald. Set in the Jazz Age on Long Island, near New York City, the novel depicts first-person narrator Nick Carraway's interactions with mysterious millionaire Jay Gatsby and Gatsby's obsession to reunite with his former lover, Daisy Buchanan.",
+//     author: "F. Scott Fitzgerald",
+//     favorite: false,
+//     chapters: [],
+//   },
+//   {
+//     id: 2,
+//     img: "",
+//     title: "1984",
+//     description:
+//       "1984 is a dystopian social science fiction novel by English novelist George Orwell. It was published on 8 June 1949 by Secker & Warburg as Orwell's ninth and final book completed in his lifetime.",
+//     author: "George Orwell",
+//     favorite: true,
+//     chapters: [],
+//   },
+//   {
+//     id: 3,
+//     img: "",
+//     title: "Moby Dick",
+//     description: "Moby Dick",
+//     author: "Herman Melville",
+//     favorite: false,
+//     chapters: [],
+//   },
+//   {
+//     id: 4,
+//     img: "",
+//     title: "To Kill a Mockingbird",
+//     description: "aaaaa",
+//     author: "Harper Lee",
+//     favorite: false,
+//     chapters: [],
+//   },
+// ];
 
 // Function to handle searching books
 export const handleSearch = (

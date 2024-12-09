@@ -18,6 +18,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
+import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import { useNavigate } from "react-router-dom";
 import {
   handleSearch,
@@ -29,6 +30,7 @@ import {
   deleteBook,
   handleNewBookClick,
   getLibraryBooks,
+  readBook,
 } from "./LibraryPage.functions";
 import { Book } from "../../types/types";
 
@@ -113,6 +115,10 @@ const LibraryPage = () => {
                   {/* Open Button */}
                   <IconButton onClick={() => openBook(book.id, navigate)}>
                     <OpenInNewIcon />
+                  </IconButton>
+                  {/* Read Button */}
+                  <IconButton onClick={() => readBook(book.id, navigate)}>
+                    <AutoStoriesIcon />
                   </IconButton>
                   {/* Edit Button */}
                   <IconButton onClick={() => editBook(book.id, navigate)}>

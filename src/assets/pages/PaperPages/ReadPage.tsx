@@ -33,7 +33,8 @@ const ReadPage = () => {
         console.log(
           "Current Page: ",
           currentPage,
-          chapters[currentPage].content
+          chapters[currentPage].content,
+          chapters.length
         );
         setMarkdown(chapters[currentPage].content);
       }, 50);
@@ -118,7 +119,7 @@ const ReadPage = () => {
             onClick={() =>
               handleNextPage(currentPage, setCurrentPage, chapters)
             }
-            disabled={currentPage === markdown.length - 1}
+            disabled={currentPage === chapters.length - 1}
           >
             Next
           </Button>
