@@ -3,10 +3,14 @@ import { useEffect, useState } from "react";
 import { Box, Button, List, Typography, ListItem } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import SaveIcon from "@mui/icons-material/Save";
+
 import { Delete, Edit, NoteAdd, Save } from "@mui/icons-material";
 import "@mdxeditor/editor/style.css";
 import {
+  BlockTypeSelect,
   BoldItalicUnderlineToggles,
+  ButtonWithTooltip,
   MDXEditor,
   UndoRedo,
   headingsPlugin,
@@ -16,12 +20,10 @@ import {
   thematicBreakPlugin,
   toolbarPlugin,
 } from "@mdxeditor/editor";
-import { Book } from "../../types/types";
+import { BookChapter } from "../../types/types";
 import { useParams } from "react-router-dom";
 import {
-  chapters,
-  doSaveBook,
-  emptyBook,
+  doGetBookChaptersByBookId,
   handleChapterClick,
   handleDeletePage,
   handleEdit,
@@ -30,7 +32,6 @@ import {
   handlePrevPage,
 } from "./PaperPage.functions";
 import { StyledPaper } from "../../components/StyledPaper";
-import { doGetBook } from "../BookPage/BookPage.functions";
 
 const CreatePage = () => {
   // State to manage the current page and underlined text
@@ -38,9 +39,10 @@ const CreatePage = () => {
   const { bookId } = useParams();
 
   const [currentPage, setCurrentPage] = useState(0);
-  const [markdown, setMarkdown] = useState<string>(chapters[0]?.content);
+  const [markdown, setMarkdown] = useState<string>("-1");
   const [editMode, setEditMode] = useState<number>(0);
-  const [book, setBook] = useState<Book>(emptyBook);
+  const [chapters, setChapters] = useState<BookChapter[]>([]);
+  const [localBookId, setLocalBookId] = useState<number>(0);
 
   useEffect(() => {
     if (currentPage >= 0 && currentPage < chapters.length) {
@@ -68,7 +70,8 @@ const CreatePage = () => {
     if (bookId) {
       const validId = parseInt(bookId);
       if (validId > 0) {
-        doGetBook(validId, setBook);
+        doGetBookChaptersByBookId(validId, setChapters);
+        setLocalBookId(validId);
       }
     }
   }, [bookId]);
@@ -100,39 +103,49 @@ const CreatePage = () => {
       {/* Text Reader (Middle Section) */}
       <Box flex="2" px={2}>
         <StyledPaper>
-          {markdown !== "-1" ? (
-            editMode === 1 ? (
-              <MDXEditor
-                markdown={markdown}
-                onChange={(value) => setMarkdown(value)}
-                plugins={[
-                  toolbarPlugin({
-                    toolbarContents: () => (
-                      <>
-                        <UndoRedo />
-                        <BoldItalicUnderlineToggles />
-                        <Box sx={{ flex: 1 }}></Box>
-                      </>
-                    ),
-                  }),
-                  headingsPlugin(),
-                  listsPlugin(),
-                  quotePlugin(),
-                  thematicBreakPlugin(),
-                  markdownShortcutPlugin(),
-                ]}
-              />
-            ) : editMode === 0 ? (
-              <MDXEditor
-                markdown={markdown}
-                onChange={(value) => setMarkdown(value)}
-                readOnly
-              />
-            ) : (
-              <></>
-            )
+          {editMode === 1 ? (
+            <MDXEditor
+              markdown={markdown}
+              onChange={(value) => setMarkdown(value)}
+              plugins={[
+                toolbarPlugin({
+                  toolbarContents: () => (
+                    <>
+                      <UndoRedo />
+                      <BoldItalicUnderlineToggles />
+                      <BlockTypeSelect />
+                      <ButtonWithTooltip
+                        title="Save Button"
+                        onClick={() =>
+                          console.log("Custom Button Clicked!", markdown)
+                        }
+                      >
+                        <SaveIcon sx={{ width: 20 }} />
+                      </ButtonWithTooltip>
+                      <Box sx={{ flex: 1 }}></Box>
+                    </>
+                  ),
+                }),
+                headingsPlugin(),
+                listsPlugin(),
+                quotePlugin(),
+                thematicBreakPlugin(),
+                markdownShortcutPlugin(),
+              ]}
+            />
           ) : (
-            <></>
+            <MDXEditor
+              markdown={markdown}
+              onChange={(value) => setMarkdown(value)}
+              readOnly
+              plugins={[
+                headingsPlugin(),
+                listsPlugin(),
+                quotePlugin(),
+                thematicBreakPlugin(),
+                markdownShortcutPlugin(),
+              ]}
+            />
           )}
         </StyledPaper>
       </Box>
@@ -164,7 +177,7 @@ const CreatePage = () => {
           <Button
             variant="contained"
             startIcon={<Edit />}
-            onClick={() => handleEdit(editMode, setEditMode, currentPage)}
+            onClick={() => handleEdit(editMode, setEditMode)}
             // disabled={} if user is not an editor
           >
             Edit
@@ -172,7 +185,7 @@ const CreatePage = () => {
           <Button
             variant="contained"
             startIcon={<NoteAdd />}
-            onClick={() => handleNewPage(book.id, chapters, setCurrentPage)}
+            onClick={() => handleNewPage(localBookId, chapters, setCurrentPage)}
             disabled={editMode === 0} // add the "if user is not an editor"
           >
             Add Page
@@ -190,7 +203,7 @@ const CreatePage = () => {
           <Button
             variant="contained"
             startIcon={<Save />}
-            onClick={() => doSaveBook(book)}
+            // onClick={() => doSaveBook(book)}
             disabled={editMode === 0 || chapters.length <= 1} // add the "if user is not an editor"
           >
             Save Book

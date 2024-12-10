@@ -12,34 +12,6 @@ export const emptyBook: Book = {
   favorite: false,
 };
 
-export const chapters: BookChapter[] = [
-  // Dummy chapters for the chapter tree
-  {
-    id: 1,
-    bookId: 1,
-    title: "Chapter 1: Introduction",
-    content: "This is the first chapter",
-  },
-  {
-    id: 2,
-    bookId: 2,
-    title: "Chapter 2: The Journey",
-    content: "This is the second chapter",
-  },
-  {
-    id: 3,
-    bookId: 3,
-    title: "Chapter 3: Challenges Ahead",
-    content: "This is the third chapter",
-  },
-  {
-    id: 4,
-    bookId: 4,
-    title: "Chapter 4: The Climax",
-    content: "This is the fourth chapter",
-  },
-];
-
 // Function to handle next page
 export const handleNextPage = (
   currentPage: number,
@@ -70,23 +42,23 @@ export const handleChapterClick = (
 
 export const handleEdit = (
   oldState: number,
-  setEditMode: React.Dispatch<React.SetStateAction<number>>,
-  currentPage: number
+  setEditMode: React.Dispatch<React.SetStateAction<number>>
 ) => {
   setEditMode(-1);
   //wait little bit
   setTimeout(() => {
-    console.log("Current Page: ", currentPage, chapters[currentPage].content);
     setEditMode(oldState == 1 ? 0 : 1);
   }, 50);
 };
+//fix new chapter
 export const handleNewPage = (
   bookId: number,
   chapters: BookChapter[],
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>
 ) => {
   const newChapter: BookChapter = {
-    id: chapters.length + 1,
+    id: 0,
+    chapterId: chapters.length + 1,
     bookId: bookId,
     title: `Chapter ${chapters.length + 1}: New Chapter`,
     content: "This is a new chapter",
@@ -111,6 +83,20 @@ export const handleDeletePage = (
   }
 };
 
+export const handleNewMarkdown = (
+  chapters: BookChapter[],
+  currentPage: number,
+  setMarkdown: (value: React.SetStateAction<string>) => void
+) => {
+  const newMarkdown =
+    (chapters[currentPage].content.includes(
+      `## ${chapters[currentPage].title}\n`
+    )
+      ? ""
+      : `## ${chapters[currentPage].title}\n`) + chapters[currentPage].content;
+  setMarkdown(newMarkdown);
+};
+
 export const doSaveBook = async (book: Book) => {
   const response = await fetch(`http://localhost:3000/book/${book.id}`, {
     method: "PUT",
@@ -125,11 +111,13 @@ export const doSaveBook = async (book: Book) => {
 
 export const doGetBookChaptersByBookId = async (
   bookId: number,
-  setChapters: React.Dispatch<React.SetStateAction<BookChapter[]>>
+  setChapters: React.Dispatch<React.SetStateAction<BookChapter[]>>,
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>
 ) => {
   const response = await getBookChaptersByBookId(bookId);
   if (response) {
     setChapters(response);
+    setCurrentPage(0);
   } else {
     console.log(`Error fetching BookChapters with bookId: ${bookId}`);
   }

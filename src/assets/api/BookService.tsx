@@ -1,4 +1,4 @@
-import { Book, BookChapter } from "../types/types";
+import { Book } from "../types/types";
 import { apiClient } from "../utils/supabase";
 
 export type IBookInfoDto = {
