@@ -49,7 +49,8 @@ const NewChapterDialog = (props: IProps) => {
     }
     const response = await handleNewChapter(
       bookId,
-      chaptersLength
+      chaptersLength,
+      chapterName
       // setCurrentPage
     );
     if (response) {

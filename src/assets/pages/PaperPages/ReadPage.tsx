@@ -106,8 +106,10 @@ const ReadPage = () => {
           {chapters.map((chapter) => (
             <ListItem
               className="chapterListItem"
-              key={chapter.id}
-              onClick={() => handleChapterClick(chapter.id, setCurrentPage)}
+              key={chapter.chapterId}
+              onClick={() =>
+                handleChapterClick(chapter.chapterId, setCurrentPage)
+              }
               style={{
                 backgroundColor:
                   currentPage === chapter.id - 1 ? "lightgray" : undefined,

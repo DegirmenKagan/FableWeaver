@@ -57,14 +57,15 @@ export const handleEdit = (
 //fix new chapter
 export const handleNewChapter = async (
   bookId: number,
-  chaptersLength: number
+  chaptersLength: number,
+  title: string
   // setCurrentPage: React.Dispatch<React.SetStateAction<number>>
 ) => {
   const newChapter: IBookChapter = {
     // id: 0, giving zero doesnt iterate as last id
     chapterId: chaptersLength + 1,
     bookId: bookId,
-    title: `Chapter ${chaptersLength + 1}: New Chapter`,
+    title: title,
     content: "This is a new chapter",
   };
 
