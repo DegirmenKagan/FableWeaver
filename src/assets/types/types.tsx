@@ -16,6 +16,7 @@ export type ProfileError = {
   password?: string;
   confirmPassword?: string;
 };
+export type IBookChapter = Omit<BookChapter, "id">; // for inserting purposes
 
 export type BookChapter = {
   id: number;

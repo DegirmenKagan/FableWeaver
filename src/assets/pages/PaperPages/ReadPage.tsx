@@ -31,15 +31,14 @@ import { BookChapter } from "../../types/types";
 import {
   doGetBookChaptersByBookId,
   handleChapterClick,
-  handleDeletePage,
-  handleEdit,
+  handleDeleteChapter,
   handleNewMarkdown,
-  handleNewPage,
-  handleNextPage,
-  handlePrevPage,
+  handleNextChapter,
+  handlePrevChapter,
 } from "./PaperPage.functions";
 import { StyledPaper } from "../../components/StyledPaper";
-import { Delete, Edit, NoteAdd, Save } from "@mui/icons-material";
+import { Delete, NoteAdd, Save } from "@mui/icons-material";
+import NewChapterDialog from "./NewChapterDialog";
 
 const ReadPage = () => {
   // State to manage the current page and underlined text
@@ -53,8 +52,10 @@ const ReadPage = () => {
   const [chapters, setChapters] = useState<BookChapter[]>([]);
   const [isReadPage, setIsReadPage] = useState<boolean>(true);
 
-  const [editMode, setEditMode] = useState<number>(0);
   const [validBookId, setValidBookId] = useState<number>(0);
+
+  const [newChapterDialogVisible, setNewChapterDialogVisible] =
+    useState<boolean>(false);
 
   useEffect(() => {
     if (currentPage >= 0 && currentPage < chapters.length) {
@@ -125,7 +126,7 @@ const ReadPage = () => {
             <Box sx={{ display: "flex" }}>
               <CircularProgress />
             </Box>
-          ) : isReadPage || editMode === 0 ? (
+          ) : isReadPage ? (
             <MDXEditor
               markdown={markdown}
               readOnly
@@ -180,7 +181,7 @@ const ReadPage = () => {
           <Button
             variant="contained"
             startIcon={<ArrowBackIcon />}
-            onClick={() => handlePrevPage(currentPage, setCurrentPage)}
+            onClick={() => handlePrevChapter(currentPage, setCurrentPage)}
             disabled={currentPage === 0}
           >
             Previous
@@ -189,7 +190,7 @@ const ReadPage = () => {
             variant="contained"
             startIcon={<ArrowForwardIcon />}
             onClick={() =>
-              handleNextPage(currentPage, setCurrentPage, chapters)
+              handleNextChapter(currentPage, setCurrentPage, chapters)
             }
             disabled={currentPage === chapters.length - 1}
           >
@@ -201,43 +202,46 @@ const ReadPage = () => {
             <>
               <Button
                 variant="contained"
-                startIcon={<Edit />}
-                onClick={() => handleEdit(editMode, setEditMode)}
-                // disabled={} if user is not an editor
-              >
-                Edit
-              </Button>
-              <Button
-                variant="contained"
                 startIcon={<NoteAdd />}
-                onClick={() =>
-                  handleNewPage(validBookId, chapters, setCurrentPage)
+                onClick={
+                  () => setNewChapterDialogVisible(true)
+                  // handleNewChapter(validBookId, chapters, setCurrentPage)
                 }
-                disabled={editMode === 0} // add the "if user is not an editor"
               >
-                Add Page
+                Add Chapter
               </Button>
               <Button
                 variant="contained"
                 startIcon={<Delete />}
                 onClick={() =>
-                  handleDeletePage(chapters, currentPage, setCurrentPage)
+                  handleDeleteChapter(chapters, currentPage, setCurrentPage)
                 }
-                disabled={editMode === 0 || chapters.length <= 1} // add the "if user is not an editor"
+                disabled={chapters.length <= 1} // add the "if user is not an editor"
               >
-                Delete Page
+                Delete Chapter
               </Button>
               <Button
                 variant="contained"
                 startIcon={<Save />}
                 // onClick={() => doSaveBook(book)}
-                disabled={editMode === 0 || chapters.length <= 1} // add the "if user is not an editor"
+                disabled={chapters.length <= 1} // add the "if user is not an editor"
               >
                 Save Book
               </Button>
             </>
           )}
         </Box>
+        <NewChapterDialog
+          dialogVisible={newChapterDialogVisible}
+          setDialogVisible={setNewChapterDialogVisible}
+          bookId={validBookId}
+          chaptersLength={chapters.length}
+          setCurrentPage={setCurrentPage}
+          _onAddChapter={() =>
+            doGetBookChaptersByBookId(validBookId, setChapters, setCurrentPage)
+          }
+          // doGetBookChaptersByBookId(_validId, setChapters, setCurrentPage);
+        />
       </Box>
     </Box>
   );

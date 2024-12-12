@@ -14,7 +14,7 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { ProfileError } from "../../types/types";
 import { ProfileContext } from "../../contexts/ProfileContext";
-import { getProfile } from "../../api/UserService";
+// import { getProfile } from "../../api/UserService";
 
 const SettingPage = () => {
   const { profile } = useContext(ProfileContext);
@@ -28,12 +28,14 @@ const SettingPage = () => {
 
   const [errors, setErrors] = useState<ProfileError>({});
 
-  const handleGetProfile = () => {
-    getProfile();
-  };
+  // const handleGetProfile = () => {
+  //   getProfile();
+  // };
 
   // Handle input change for email, name, and password
-  const handleInputChange = (e) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setUserData({ ...userData, [name]: value });
   };
@@ -56,7 +58,9 @@ const SettingPage = () => {
   };
 
   // Handle password input change
-  const handlePasswordChange = (e) => {
+  const handlePasswordChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     switch (name) {
       case "oldPassword":
@@ -107,7 +111,7 @@ const SettingPage = () => {
   };
 
   // Handle form submission for updating user information
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     console.log(typeof e);
     e.preventDefault();
     if (validateForm()) {

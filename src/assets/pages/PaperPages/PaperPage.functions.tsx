@@ -1,5 +1,9 @@
-import { getBookChaptersByBookId } from "../../api/BookChapterService";
-import { Book, BookChapter } from "../../types/types";
+import {
+  addBookChapter,
+  deleteBookChapter,
+  getBookChaptersByBookId,
+} from "../../api/BookChapterService";
+import { Book, BookChapter, IBookChapter } from "../../types/types";
 
 export const emptyBook: Book = {
   id: 0,
@@ -13,7 +17,7 @@ export const emptyBook: Book = {
 };
 
 // Function to handle next page
-export const handleNextPage = (
+export const handleNextChapter = (
   currentPage: number,
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>,
   chapters: BookChapter[]
@@ -24,7 +28,7 @@ export const handleNextPage = (
 };
 
 // Function to handle previous page
-export const handlePrevPage = (
+export const handlePrevChapter = (
   currentPage: number,
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>
 ) => {
@@ -51,35 +55,58 @@ export const handleEdit = (
   }, 50);
 };
 //fix new chapter
-export const handleNewPage = (
+export const handleNewChapter = async (
   bookId: number,
-  chapters: BookChapter[],
-  setCurrentPage: React.Dispatch<React.SetStateAction<number>>
+  chaptersLength: number
+  // setCurrentPage: React.Dispatch<React.SetStateAction<number>>
 ) => {
-  const newChapter: BookChapter = {
-    id: 0,
-    chapterId: chapters.length + 1,
+  const newChapter: IBookChapter = {
+    // id: 0, giving zero doesnt iterate as last id
+    chapterId: chaptersLength + 1,
     bookId: bookId,
-    title: `Chapter ${chapters.length + 1}: New Chapter`,
+    title: `Chapter ${chaptersLength + 1}: New Chapter`,
     content: "This is a new chapter",
   };
-  chapters.push(newChapter);
-  setCurrentPage(chapters.length - 1);
+
+  const response = await addBookChapter(newChapter);
+
+  if (response) {
+    console.log("Chapter added, refreshing chapters");
+    // setCurrentPage(chaptersLength - 1);
+    return true;
+  } else {
+    console.log("Error adding chapter");
+    return false;
+  }
 };
 
-export const handleDeletePage = (
+export const handleSaveChapter = async (
+  chapters: BookChapter[],
+  currentPage: number,
+  setMarkdown: (value: React.SetStateAction<string>) => void
+) => {
+  chapters[currentPage].content = chapters[currentPage].content.replace(
+    chapters[currentPage].content,
+    ""
+  );
+  setMarkdown(chapters[currentPage].content);
+};
+
+export const handleDeleteChapter = async (
   chapters: BookChapter[],
   currentPage: number,
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>
 ) => {
-  // delete the current page
-  chapters.splice(currentPage, 1);
-
-  // update the content of the current page
-  if (currentPage > 0) {
-    setCurrentPage(currentPage - 1);
-  } else {
-    setCurrentPage(0);
+  const response = await deleteBookChapter(chapters[currentPage].id);
+  if (response) {
+    // delete the current page
+    chapters.splice(currentPage, 1);
+    // update the content of the current page
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    } else {
+      setCurrentPage(0);
+    }
   }
 };
 
@@ -112,12 +139,13 @@ export const doSaveBook = async (book: Book) => {
 export const doGetBookChaptersByBookId = async (
   bookId: number,
   setChapters: React.Dispatch<React.SetStateAction<BookChapter[]>>,
-  setCurrentPage: React.Dispatch<React.SetStateAction<number>>
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>,
+  isNewChapterAdded?: boolean
 ) => {
   const response = await getBookChaptersByBookId(bookId);
   if (response) {
     setChapters(response);
-    setCurrentPage(0);
+    setCurrentPage(isNewChapterAdded ? response.length - 1 : 0);
   } else {
     console.log(`Error fetching BookChapters with bookId: ${bookId}`);
   }

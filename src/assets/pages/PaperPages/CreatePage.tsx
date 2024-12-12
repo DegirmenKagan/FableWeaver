@@ -25,11 +25,11 @@ import { useParams } from "react-router-dom";
 import {
   doGetBookChaptersByBookId,
   handleChapterClick,
-  handleDeletePage,
+  handleDeleteChapter,
   handleEdit,
-  handleNewPage,
-  handleNextPage,
-  handlePrevPage,
+  handleNewChapter,
+  handleNextChapter,
+  handlePrevChapter,
 } from "./PaperPage.functions";
 import { StyledPaper } from "../../components/StyledPaper";
 
@@ -159,7 +159,7 @@ const CreatePage = () => {
           <Button
             variant="contained"
             startIcon={<ArrowBackIcon />}
-            onClick={() => handlePrevPage(currentPage, setCurrentPage)}
+            onClick={() => handlePrevChapter(currentPage, setCurrentPage)}
             disabled={currentPage === 0}
           >
             Previous
@@ -168,7 +168,7 @@ const CreatePage = () => {
             variant="contained"
             startIcon={<ArrowForwardIcon />}
             onClick={() =>
-              handleNextPage(currentPage, setCurrentPage, chapters)
+              handleNextChapter(currentPage, setCurrentPage, chapters)
             }
             disabled={currentPage === markdown.length - 1}
           >
@@ -185,7 +185,9 @@ const CreatePage = () => {
           <Button
             variant="contained"
             startIcon={<NoteAdd />}
-            onClick={() => handleNewPage(localBookId, chapters, setCurrentPage)}
+            onClick={() =>
+              handleNewChapter(localBookId, chapters, setCurrentPage)
+            }
             disabled={editMode === 0} // add the "if user is not an editor"
           >
             Add Page
@@ -194,7 +196,7 @@ const CreatePage = () => {
             variant="contained"
             startIcon={<Delete />}
             onClick={() =>
-              handleDeletePage(chapters, currentPage, setCurrentPage)
+              handleDeleteChapter(chapters, currentPage, setCurrentPage)
             }
             disabled={editMode === 0 || chapters.length <= 1} // add the "if user is not an editor"
           >

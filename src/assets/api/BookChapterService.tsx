@@ -1,4 +1,4 @@
-import { BookChapter } from "../types/types";
+import { BookChapter, IBookChapter } from "../types/types";
 import { apiClient } from "../utils/supabase";
 
 export const getBookChaptersByBookId = async (bookId: number) => {
@@ -37,7 +37,7 @@ export const getBookChapterByChapterId = async (id: number) => {
   }
 };
 
-export const addBookChapter = async (chapter: BookChapter) => {
+export const addBookChapter = async (chapter: IBookChapter) => {
   try {
     const { error } = await apiClient.from("BookChapter").insert([chapter]);
     if (error) {
@@ -46,6 +46,19 @@ export const addBookChapter = async (chapter: BookChapter) => {
     return true;
   } catch (error) {
     console.error("addBookChapter", error);
+    return null;
+  }
+};
+
+export const deleteBookChapter = async (id: number) => {
+  try {
+    const { error } = await apiClient.from("BookChapter").delete().eq("id", id);
+    if (error) {
+      throw error;
+    }
+    return true;
+  } catch (error) {
+    console.error("deleteBookChapter", error);
     return null;
   }
 };
