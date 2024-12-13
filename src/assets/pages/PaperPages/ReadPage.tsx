@@ -10,13 +10,11 @@ import {
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import SaveIcon from "@mui/icons-material/Save";
 
 import "@mdxeditor/editor/style.css";
 import {
   BlockTypeSelect,
   BoldItalicUnderlineToggles,
-  ButtonWithTooltip,
   headingsPlugin,
   listsPlugin,
   markdownShortcutPlugin,
@@ -29,16 +27,19 @@ import {
 import { useLocation, useParams } from "react-router-dom";
 import { BookChapter } from "../../types/types";
 import {
+  checkUnsavedChapterChanges,
   doGetBookChaptersByBookId,
   handleChapterClick,
   handleDeleteChapter,
   handleNewMarkdown,
   handleNextChapter,
   handlePrevChapter,
+  handleSaveChapter,
 } from "./PaperPage.functions";
 import { StyledPaper } from "../../components/StyledPaper";
 import { Delete, NoteAdd, Save } from "@mui/icons-material";
 import NewChapterDialog from "./NewChapterDialog";
+import MessageDialog from "../../components/MessageDialog";
 
 const ReadPage = () => {
   // State to manage the current page and underlined text
@@ -56,6 +57,8 @@ const ReadPage = () => {
 
   const [newChapterDialogVisible, setNewChapterDialogVisible] =
     useState<boolean>(false);
+  const [checkModalVisible, setCheckModalVisible] = useState<boolean>(false);
+  const [isNext, setIsNext] = useState<boolean>(false);
 
   useEffect(() => {
     if (currentPage >= 0 && currentPage < chapters.length) {
@@ -71,7 +74,6 @@ const ReadPage = () => {
   useEffect(() => {
     if (chapters.length > 0 && markdown !== "" && currentPage >= 0) {
       setMarkdown(chapters[currentPage ?? 0].content);
-      console.log(chapters, markdown, currentPage);
     }
   }, [chapters]); // Only run once on mount
 
@@ -81,7 +83,6 @@ const ReadPage = () => {
       if (_validId > 0) {
         setValidBookId(_validId);
         doGetBookChaptersByBookId(_validId, setChapters, setCurrentPage);
-        console.log(_validId, chapters, currentPage);
       }
     }
   }, [bookId]);
@@ -108,7 +109,14 @@ const ReadPage = () => {
               className="chapterListItem"
               key={chapter.chapterId}
               onClick={() =>
-                handleChapterClick(chapter.chapterId, setCurrentPage)
+                handleChapterClick(
+                  chapter.chapterId,
+                  chapters,
+                  currentPage,
+                  markdown,
+                  setCheckModalVisible,
+                  setCurrentPage
+                )
               }
               style={{
                 backgroundColor:
@@ -151,14 +159,14 @@ const ReadPage = () => {
                       <UndoRedo />
                       <BoldItalicUnderlineToggles />
                       <BlockTypeSelect />
-                      <ButtonWithTooltip
+                      {/* <ButtonWithTooltip
                         title="Save Button"
                         onClick={() =>
                           console.log("Custom Button Clicked!", markdown)
                         }
                       >
                         <SaveIcon sx={{ width: 20 }} />
-                      </ButtonWithTooltip>
+                      </ButtonWithTooltip> */}
                       <Box sx={{ flex: 1 }}></Box>
                     </>
                   ),
@@ -183,7 +191,18 @@ const ReadPage = () => {
           <Button
             variant="contained"
             startIcon={<ArrowBackIcon />}
-            onClick={() => handlePrevChapter(currentPage, setCurrentPage)}
+            // onClick={() => handlePrevChapter(currentPage, setCurrentPage)}
+            onClick={() =>
+              checkUnsavedChapterChanges(
+                chapters,
+                currentPage,
+                setCurrentPage,
+                markdown,
+                setCheckModalVisible,
+                false,
+                setIsNext
+              )
+            }
             disabled={currentPage === 0}
           >
             Previous
@@ -191,8 +210,19 @@ const ReadPage = () => {
           <Button
             variant="contained"
             startIcon={<ArrowForwardIcon />}
+            // onClick={() =>
+            //   handleNextChapter(currentPage, setCurrentPage, chapters)
+            // }
             onClick={() =>
-              handleNextChapter(currentPage, setCurrentPage, chapters)
+              checkUnsavedChapterChanges(
+                chapters,
+                currentPage,
+                setCurrentPage,
+                markdown,
+                setCheckModalVisible,
+                true,
+                setIsNext
+              )
             }
             disabled={currentPage === chapters.length - 1}
           >
@@ -225,10 +255,12 @@ const ReadPage = () => {
               <Button
                 variant="contained"
                 startIcon={<Save />}
-                // onClick={() => doSaveBook(book)}
+                onClick={() =>
+                  handleSaveChapter(chapters, markdown, currentPage)
+                }
                 disabled={chapters.length <= 1} // add the "if user is not an editor"
               >
-                Save Book
+                Save Chapter
               </Button>
             </>
           )}
@@ -244,6 +276,22 @@ const ReadPage = () => {
           }
           // doGetBookChaptersByBookId(_validId, setChapters, setCurrentPage);
         />
+
+        <MessageDialog
+          title={"You have unsaved changes"}
+          dialogVisible={checkModalVisible}
+          setDialogVisible={setCheckModalVisible}
+          _onOKClick={() =>
+            isNext
+              ? handleNextChapter(currentPage, setCurrentPage, chapters)
+              : handlePrevChapter(currentPage, setCurrentPage)
+          }
+        >
+          <Typography>
+            You have unsaved changes. Are you sure you want to leave this
+            chapter?
+          </Typography>
+        </MessageDialog>
       </Box>
     </Box>
   );

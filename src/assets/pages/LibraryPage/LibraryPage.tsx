@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -33,9 +33,11 @@ import {
   readBook,
 } from "./LibraryPage.functions";
 import { Book } from "../../types/types";
+import { ProfileContext } from "../../contexts/ProfileContext";
 
 const LibraryPage = () => {
   const navigate = useNavigate();
+  const { profile } = useContext(ProfileContext);
   const [books, setBooks] = useState<Book[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [view, setView] = useState("grid"); // Toggle between 'list' and 'grid'
@@ -106,7 +108,9 @@ const LibraryPage = () => {
                 <CardActions>
                   {/* Favorite Button */}
                   <IconButton
-                    onClick={() => toggleFavorite(book.id, books, setBooks)}
+                    onClick={() =>
+                      toggleFavorite(book.id, profile.id, books, setBooks)
+                    }
                   >
                     <FavoriteIcon
                       color={book.favorite ? "secondary" : "inherit"}

@@ -1,6 +1,10 @@
 import { NavigateFunction } from "react-router-dom";
-import { Book } from "../../types/types";
+import { Book, BookFavorite } from "../../types/types";
 import { getBooks } from "../../api/BookService";
+import {
+  addBookFavorite,
+  deleteBookFavoriteByBookIdUserId,
+} from "../../api/BookFavoriteService";
 
 // export const initialBooks: Book[] = [
 //   {
@@ -52,15 +56,41 @@ export const handleSearch = (
 };
 
 // Function to mark a book as favorite
-export const toggleFavorite = (
-  id: number,
+export const toggleFavorite = async (
+  bookId: number,
+  userId: number,
   books: Book[],
   setBooks: React.Dispatch<React.SetStateAction<Book[]>>
 ) => {
-  const updatedBooks = books.map((book) =>
-    book.id === id ? { ...book, favorite: !book.favorite } : book
-  );
-  setBooks(updatedBooks);
+  const newFav: BookFavorite = {
+    bookId,
+    userId,
+  };
+
+  if (books.find((x) => x.id === bookId)?.favorite) {
+    const response = await deleteBookFavoriteByBookIdUserId(
+      newFav.bookId,
+      newFav.userId
+    );
+    if (response) {
+      const updatedBooks = books.map((book) =>
+        book.id === bookId ? { ...book, favorite: !book.favorite } : book
+      );
+      setBooks(updatedBooks);
+    } else {
+      alert("Error deleting favorite");
+    }
+  } else {
+    const response = await addBookFavorite(newFav);
+    if (response) {
+      const updatedBooks = books.map((book) =>
+        book.id === bookId ? { ...book, favorite: !book.favorite } : book
+      );
+      setBooks(updatedBooks);
+    } else {
+      alert("Error adding favorite");
+    }
+  }
 };
 
 // Function to delete a book

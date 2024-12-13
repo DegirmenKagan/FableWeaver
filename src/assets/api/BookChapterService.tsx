@@ -62,3 +62,20 @@ export const deleteBookChapter = async (id: number) => {
     return null;
   }
 };
+
+//update chapter
+export const updateBookChapter = async (chapter: BookChapter) => {
+  try {
+    const { error } = await apiClient
+      .from("BookChapter")
+      .update(chapter)
+      .eq("id", chapter.id);
+    if (error) {
+      throw error;
+    }
+    return true;
+  } catch (error) {
+    console.error("updateBookChapter", error);
+    return null;
+  }
+};

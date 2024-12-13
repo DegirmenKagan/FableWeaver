@@ -2,6 +2,7 @@ import {
   addBookChapter,
   deleteBookChapter,
   getBookChaptersByBookId,
+  updateBookChapter,
 } from "../../api/BookChapterService";
 import { Book, BookChapter, IBookChapter } from "../../types/types";
 
@@ -37,11 +38,49 @@ export const handlePrevChapter = (
   }
 };
 
+export const checkUnsavedChapterChanges = (
+  chapters: BookChapter[],
+  currentPage: number,
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>,
+  markdown: string,
+  setCheckModalVisible: React.Dispatch<React.SetStateAction<boolean>>,
+  isNext: boolean,
+  setIsNext: React.Dispatch<React.SetStateAction<boolean>>
+) => {
+  console.log(
+    currentPage,
+    chapters[currentPage].content !== markdown,
+    "chapcontent\n",
+    chapters[currentPage].content.length,
+    "\nmarkdown",
+    markdown.length
+    // show differences of two strings;
+  );
+  if (chapters[currentPage].content !== markdown) {
+    setCheckModalVisible(true);
+    setIsNext(isNext);
+  } else {
+    if (isNext) {
+      handleNextChapter(currentPage, setCurrentPage, chapters);
+    } else {
+      handlePrevChapter(currentPage, setCurrentPage);
+    }
+  }
+};
+
 export const handleChapterClick = (
   chapterId: number,
+  chapters: BookChapter[],
+  currentPage: number,
+  markdown: string,
+  setCheckModalVisible: React.Dispatch<React.SetStateAction<boolean>>,
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>
 ) => {
-  setCurrentPage(chapterId - 1);
+  if (chapters[currentPage].content !== markdown) {
+    setCheckModalVisible(true);
+  } else {
+    setCurrentPage(chapterId - 1);
+  }
 };
 
 export const handleEdit = (
@@ -83,14 +122,26 @@ export const handleNewChapter = async (
 
 export const handleSaveChapter = async (
   chapters: BookChapter[],
-  currentPage: number,
-  setMarkdown: (value: React.SetStateAction<string>) => void
+  markdown: string,
+  currentPage: number
+  // setMarkdown: (value: React.SetStateAction<string>) => void
 ) => {
-  chapters[currentPage].content = chapters[currentPage].content.replace(
-    chapters[currentPage].content,
-    ""
-  );
-  setMarkdown(chapters[currentPage].content);
+  // chapters[currentPage].content = chapters[currentPage].content.replace(
+  //   chapters[currentPage].content,
+  //   ""
+  // );
+  const updatedChapter = chapters[currentPage];
+  updatedChapter.content = markdown;
+  console.log(updatedChapter);
+  const response = await updateBookChapter(updatedChapter);
+  if (response) {
+    return true;
+  } else {
+    console.log("Error updating chapter");
+    return false;
+  }
+
+  // setMarkdown(chapters[currentPage].content);
 };
 
 export const handleDeleteChapter = async (
@@ -116,13 +167,13 @@ export const handleNewMarkdown = (
   currentPage: number,
   setMarkdown: (value: React.SetStateAction<string>) => void
 ) => {
-  const newMarkdown =
-    (chapters[currentPage].content.includes(
-      `## ${chapters[currentPage].title}\n`
-    )
-      ? ""
-      : `## ${chapters[currentPage].title}\n`) + chapters[currentPage].content;
-  setMarkdown(newMarkdown);
+  // const newMarkdown =
+  //   (chapters[currentPage].content.includes(
+  //     `## ${chapters[currentPage].title}\n`
+  //   )
+  //     ? ""
+  //     : `## ${chapters[currentPage].title}\n`) + chapters[currentPage].content;
+  setMarkdown(chapters[currentPage].content);
 };
 
 export const doSaveBook = async (book: Book) => {

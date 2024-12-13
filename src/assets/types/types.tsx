@@ -39,7 +39,7 @@ export type Book = {
 };
 
 export type BookFavorite = {
-  id: number;
+  id?: number;
   bookId: number;
   userId: number;
 };
