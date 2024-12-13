@@ -44,7 +44,7 @@ const LibraryPage = () => {
   const CARDHEIGHT = 175;
 
   useEffect(() => {
-    if (books.length === 0) getLibraryBooks(setBooks);
+    if (books.length === 0) getLibraryBooks(profile.id, setBooks);
   }, [books]);
 
   return (

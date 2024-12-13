@@ -10,15 +10,30 @@ export type IBookInfoDto = {
   author: string;
 };
 
-export const getBooks = async () => {
+export type IBookView = Book & {
+  favoriteuserid?: number; // hepsini kucuk harf gonderiyor api
+};
+
+export const getBooks = async (profileId: number) => {
   try {
-    console.log("getBooks", apiClient);
-    const { data, error } = await apiClient.from("Book").select();
+    //inner join BookFavorite on Book.id = BookFavorite.bookId
+    const { data, error } = await apiClient
+      .from("book_view")
+      // .select();
+      .select();
+
     if (error) {
       throw error;
     }
-    console.log("getBooks", data);
-    const user = data as Book[];
+    let responseData: IBookView[] = data as IBookView[];
+    responseData = responseData.filter((item) =>
+      item.favoriteuserid ? item.favoriteuserid === profileId : true
+    );
+    responseData.forEach((item) => {
+      item.favorite = item.favoriteuserid ? true : false;
+    });
+    const user = responseData as Book[];
+    console.log("getBooks", user);
     return user;
   } catch (error) {
     console.error("getBooks", error);

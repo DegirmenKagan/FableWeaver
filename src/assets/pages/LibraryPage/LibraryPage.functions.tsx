@@ -145,9 +145,10 @@ export const handleNewBookClick = (navigate: NavigateFunction) => {
 };
 
 export const getLibraryBooks = async (
+  profileId: number,
   setBooks: React.Dispatch<React.SetStateAction<Book[]>>
 ) => {
-  const response = await getBooks();
+  const response = await getBooks(profileId);
   if (response) {
     console.log("Fetched books:", response);
     setBooks(response);
