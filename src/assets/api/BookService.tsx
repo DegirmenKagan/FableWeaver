@@ -8,10 +8,13 @@ export type IBookInfoDto = {
   title: string;
   description: string;
   author: string;
+  genreid?: number;
+  genrename?: string;
 };
 
 export type IBookView = Book & {
   favoriteuserid?: number; // hepsini kucuk harf gonderiyor api
+  genrename?: string;
 };
 
 export const getBooks = async (profileId: number) => {
@@ -44,7 +47,7 @@ export const getBooks = async (profileId: number) => {
 export const getBook = async (id: number) => {
   try {
     const { data, error } = await apiClient
-      .from("Book")
+      .from("book_view")
       .select("*")
       .eq("id", id)
       .single();

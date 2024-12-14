@@ -31,9 +31,12 @@ import {
   handleNewBookClick,
   getLibraryBooks,
   readBook,
+  handleGenreFilterClick,
 } from "./LibraryPage.functions";
-import { Book } from "../../types/types";
+import { Book, IGenre } from "../../types/types";
 import { ProfileContext } from "../../contexts/ProfileContext";
+import TextLookup, { ILookupItem } from "../../components/TextLookup";
+import { doGetGenres } from "../BookPage/BookPage.functions";
 
 const LibraryPage = () => {
   const navigate = useNavigate();
@@ -41,10 +44,35 @@ const LibraryPage = () => {
   const [books, setBooks] = useState<Book[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [view, setView] = useState("grid"); // Toggle between 'list' and 'grid'
-  const CARDHEIGHT = 175;
+  const CARDHEIGHT = 205;
+
+  const [genres, setGenres] = useState<IGenre[]>([]);
+  const [genreLookup, setGenreLookup] = useState<ILookupItem[]>([]);
+  const [genreIdFilter, setGenreIdFilter] = useState<number[]>([]);
 
   useEffect(() => {
-    if (books.length === 0) getLibraryBooks(profile.id, setBooks);
+    if (genres.length > 0) {
+      const tmpLookup: ILookupItem[] = [];
+      genres.forEach((x) => {
+        const _lookupItem: ILookupItem = {
+          id: x.id,
+          name: x.name,
+          onClick: () =>
+            handleGenreFilterClick(x.id, genreIdFilter, setGenreIdFilter),
+          // onClick: () =>
+          //   handleGenreFilterClick(book, x, setBook, setBooksGenreName), //genreName updateleniyor ama yazdırmıyor ekranda
+        };
+        tmpLookup.push(_lookupItem);
+        setGenreLookup(tmpLookup);
+      });
+    }
+  }, [genres]);
+
+  useEffect(() => {
+    if (books.length === 0) {
+      getLibraryBooks(profile.id, setBooks);
+      doGetGenres(setGenres);
+    }
   }, [books]);
 
   return (
@@ -77,6 +105,16 @@ const LibraryPage = () => {
         <ToggleButton value="grid" aria-label="grid view">
           <ViewModuleIcon />
         </ToggleButton>
+        <Box sx={{ display: "flex", alignItems: "center", marginInline: 2 }}>
+          <TextLookup
+            title={`Genre ${
+              genreIdFilter.length > 0
+                ? ":" + genreLookup.find((x) => x.id === genreIdFilter[0])?.name
+                : ""
+            }`}
+            lookupItems={genreLookup}
+          />
+        </Box>
       </ToggleButtonGroup>
 
       {/* Flexbox layout for Grid/List */}
@@ -99,11 +137,35 @@ const LibraryPage = () => {
               variant="outlined"
             >
               <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
-                <CardContent>
-                  <Typography variant="h6">{book.title}</Typography>
-                  <Typography variant="subtitle2" color="textSecondary">
-                    Author: {book.author}
-                  </Typography>
+                <CardContent
+                  sx={{
+                    flex: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="h6">{book.title}</Typography>
+                    <Typography variant="subtitle2" color="textSecondary">
+                      Author: {book.author}
+                    </Typography>
+                    {/* display genre as Button */}
+                  </Box>
+                  <Box>
+                    {book.genrename ? (
+                      <Button
+                        id="basic-button"
+                        variant="contained"
+                        size="small"
+                        sx={{ paddingBlock: 0.5 }}
+                        // onClick={handleFilterByGenre(book.genreId)}
+                      >
+                        {book.genrename}
+                      </Button>
+                    ) : (
+                      <></>
+                    )}
+                  </Box>
                 </CardContent>
                 <CardActions>
                   {/* Favorite Button */}

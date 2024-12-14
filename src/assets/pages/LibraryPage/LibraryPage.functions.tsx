@@ -55,6 +55,34 @@ export const handleSearch = (
   setSearchQuery(event.target.value);
 };
 
+export const handleGenreFilterClick = async (
+  clickedGenreId: number,
+  genreIdFilter: number[],
+  setGenreIdFilter: React.Dispatch<React.SetStateAction<number[]>>
+) => {
+  console.log(
+    genreIdFilter,
+    clickedGenreId,
+    genreIdFilter.includes(clickedGenreId)
+  );
+  if (genreIdFilter.includes(clickedGenreId)) {
+    setGenreIdFilter([]);
+  } else {
+    const tmpArr = genreIdFilter;
+    tmpArr.push(clickedGenreId);
+    setGenreIdFilter(tmpArr);
+  }
+  // let tmpFilterArr = genreIdFilter;
+  // //push if not exists
+  // if (tmpFilterArr.includes(clickedGenreId)) {
+  //   tmpFilterArr = tmpFilterArr.filter((x) => x !== clickedGenreId);
+  // } else {
+  //   tmpFilterArr.push(clickedGenreId);
+  // }
+
+  // setGenreIdFilter(tmpFilterArr);
+};
+
 // Function to mark a book as favorite
 export const toggleFavorite = async (
   bookId: number,

@@ -35,6 +35,8 @@ export type Book = {
   author: string;
   rating?: number;
   favorite: boolean;
+  genreId?: number;
+  genrename?: string;
   chapters: BookChapter[];
 };
 
@@ -69,4 +71,9 @@ export type ICommentDto = {
   username: string;
   text: string;
   avatar?: string;
+};
+
+export type IGenre = {
+  id: number;
+  name: string;
 };

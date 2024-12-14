@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import { Box, Typography, Rating, Divider } from "@mui/material";
 import { useParams } from "react-router-dom";
-import { Book } from "../../types/types";
+import { Book, IGenre } from "../../types/types";
 import { emptyBook } from "../PaperPages/PaperPage.functions";
 import BookComments from "./BookComments/BookComments";
 import {
   doGetBook,
   doGetBookRating,
   doAddUserRating,
+  doGetGenres,
+  handleGenreLookupClick,
 } from "./BookPage.functions";
+import TextLookup, { ILookupItem } from "../../components/TextLookup";
 
 const BookPage = () => {
   const { bookId } = useParams();
@@ -16,7 +19,9 @@ const BookPage = () => {
   const [bookRating, setBookRating] = useState<number>(0);
 
   const [userRating, setUserRating] = useState(0);
-
+  const [genres, setGenres] = useState<IGenre[]>([]);
+  const [booksGenreName, setBooksGenreName] = useState<string>("No Genre");
+  const [genreLookup, setGenreLookup] = useState<ILookupItem[]>([]);
   const handleUserRating = (
     event: React.SyntheticEvent,
     value: number | null
@@ -29,8 +34,9 @@ const BookPage = () => {
     if (bookId) {
       const validId = parseInt(bookId);
       if (validId > 0) {
-        doGetBook(validId, setBook);
+        doGetBook(validId, setBook, setBooksGenreName);
         doGetBookRating(validId, setBookRating);
+        doGetGenres(setGenres);
       }
     }
   }, [bookId]);
@@ -41,6 +47,28 @@ const BookPage = () => {
       doAddUserRating(userRating, book.id, 1, setBookRating);
     }
   }, [userRating]);
+
+  useEffect(() => {
+    if (genres.length > 0) {
+      const tmpLookup: ILookupItem[] = [];
+      genres.forEach((x) => {
+        const _lookupItem: ILookupItem = {
+          id: x.id,
+          name: x.name,
+          onClick: () =>
+            handleGenreLookupClick(book, x, setBook, setBooksGenreName), //genreName updateleniyor ama yazdırmıyor ekranda
+        };
+        tmpLookup.push(_lookupItem);
+        setGenreLookup(tmpLookup);
+      });
+    }
+  }, [genres]);
+
+  useEffect(() => {
+    if (booksGenreName) {
+      console.log("genredeis", booksGenreName);
+    }
+  }, [booksGenreName]);
 
   return (
     <Box p={3}>
@@ -66,6 +94,8 @@ const BookPage = () => {
           <Typography variant="body1" paragraph>
             {book.description}
           </Typography>
+
+          <TextLookup title={booksGenreName} lookupItems={genreLookup} />
 
           {/* Star Rating */}
           <Box display="flex" alignItems="center" mb={2}>

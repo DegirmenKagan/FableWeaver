@@ -3,19 +3,52 @@ import {
   getBookRatingByBookId,
 } from "../../api/BookRatingService";
 import { getBook } from "../../api/BookService";
-import { Book, BookRating } from "../../types/types";
+import { getGenres, patchBookGenre } from "../../api/GenreService";
+import { Book, BookRating, IGenre } from "../../types/types";
 
 export const doGetBook = async (
   bookId: number,
-  setBook: React.Dispatch<React.SetStateAction<Book>>
+  setBook: React.Dispatch<React.SetStateAction<Book>>,
+  setBooksGenreName: React.Dispatch<React.SetStateAction<string>>
 ) => {
   const response = await getBook(bookId);
   if (response) {
     console.log(`Fetched books: with ID: ${bookId}`, response);
     const book = response as Book;
     setBook(book);
+    if (book.genrename) setBooksGenreName(book.genrename);
   } else {
     console.log(`Error fetching book with ID: ${bookId}`);
+  }
+};
+
+export const doGetGenres = async (
+  setGenres: React.Dispatch<React.SetStateAction<IGenre[]>>
+) => {
+  const response = await getGenres();
+  if (response) {
+    console.log("Fetched genres", response);
+    const genres = response as IGenre[];
+    setGenres(genres);
+  } else {
+    console.log("Error fetching genres");
+  }
+};
+
+export const handleGenreLookupClick = async (
+  book: Book,
+  genre: IGenre,
+  setBook: React.Dispatch<React.SetStateAction<Book>>,
+  setBooksGenreName: React.Dispatch<React.SetStateAction<string>>
+) => {
+  const response = await patchBookGenre(book.id, genre.id);
+  if (response) {
+    console.log(response, genre);
+    const tmpBook = book;
+    tmpBook.genreId = genre.id;
+    tmpBook.genrename = genre.name;
+    setBook(tmpBook);
+    setBooksGenreName(genre.name);
   }
 };
 
