@@ -1,5 +1,5 @@
 import { NavigateFunction } from "react-router-dom";
-import { Book, BookFavorite } from "../../types/types";
+import { Book, BookFavorite, IGenre } from "../../types/types";
 import { getBooks } from "../../api/BookService";
 import {
   addBookFavorite,
@@ -55,22 +55,32 @@ export const handleSearch = (
   setSearchQuery(event.target.value);
 };
 
+export const handleGenreFilterAllClick = async (
+  setGenreIdFilter: React.Dispatch<React.SetStateAction<number>>,
+  setGenreName: React.Dispatch<React.SetStateAction<string>>
+) => {
+  setGenreIdFilter(0);
+  setGenreName("Genre");
+};
+
 export const handleGenreFilterClick = async (
-  clickedGenreId: number,
-  genreIdFilter: number[],
-  setGenreIdFilter: React.Dispatch<React.SetStateAction<number[]>>
+  clickedGenre: IGenre,
+  genreIdFilter: number,
+  setGenreIdFilter: React.Dispatch<React.SetStateAction<number>>,
+  setGenreName: React.Dispatch<React.SetStateAction<string>>
 ) => {
   console.log(
     genreIdFilter,
-    clickedGenreId,
-    genreIdFilter.includes(clickedGenreId)
+    clickedGenre
+    // genreIdFilter.includes(clickedGenre)
   );
-  if (genreIdFilter.includes(clickedGenreId)) {
-    setGenreIdFilter([]);
+  // if (genreIdFilter.includes(clickedGenre)) {
+  if (genreIdFilter === clickedGenre.id) {
+    setGenreIdFilter(0);
+    setGenreName("Genre");
   } else {
-    const tmpArr = genreIdFilter;
-    tmpArr.push(clickedGenreId);
-    setGenreIdFilter(tmpArr);
+    setGenreIdFilter(clickedGenre.id);
+    setGenreName(clickedGenre.name);
   }
   // let tmpFilterArr = genreIdFilter;
   // //push if not exists
@@ -149,8 +159,15 @@ export const editBook = (id: number, navigate: NavigateFunction) => {
 };
 
 // Filter books based on search query
-export const filteredBooks = (books: Book[], searchQuery: string): Book[] => {
-  return books.filter(
+export const filteredBooks = (
+  books: Book[],
+  searchQuery: string,
+  genreId: number
+): Book[] => {
+  const filteredBooks = books.filter((x) =>
+    genreId > 0 ? x.genreId === genreId : true
+  );
+  return filteredBooks.filter(
     (book) =>
       book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       book.author.toLowerCase().includes(searchQuery.toLowerCase())

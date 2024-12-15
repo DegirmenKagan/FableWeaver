@@ -32,6 +32,7 @@ import {
   getLibraryBooks,
   readBook,
   handleGenreFilterClick,
+  handleGenreFilterAllClick,
 } from "./LibraryPage.functions";
 import { Book, IGenre } from "../../types/types";
 import { ProfileContext } from "../../contexts/ProfileContext";
@@ -48,17 +49,30 @@ const LibraryPage = () => {
 
   const [genres, setGenres] = useState<IGenre[]>([]);
   const [genreLookup, setGenreLookup] = useState<ILookupItem[]>([]);
-  const [genreIdFilter, setGenreIdFilter] = useState<number[]>([]);
+  const [genreIdFilter, setGenreIdFilter] = useState<number>(0);
+  const [genreName, setGenreName] = useState<string>("Genre");
 
   useEffect(() => {
     if (genres.length > 0) {
       const tmpLookup: ILookupItem[] = [];
+      const allOption: ILookupItem = {
+        id: 0,
+        name: "All",
+        onClick: () =>
+          handleGenreFilterAllClick(setGenreIdFilter, setGenreName),
+      };
+      tmpLookup.push(allOption);
       genres.forEach((x) => {
         const _lookupItem: ILookupItem = {
           id: x.id,
           name: x.name,
           onClick: () =>
-            handleGenreFilterClick(x.id, genreIdFilter, setGenreIdFilter),
+            handleGenreFilterClick(
+              x,
+              genreIdFilter,
+              setGenreIdFilter,
+              setGenreName
+            ),
           // onClick: () =>
           //   handleGenreFilterClick(book, x, setBook, setBooksGenreName), //genreName updateleniyor ama yazdırmıyor ekranda
         };
@@ -106,14 +120,7 @@ const LibraryPage = () => {
           <ViewModuleIcon />
         </ToggleButton>
         <Box sx={{ display: "flex", alignItems: "center", marginInline: 2 }}>
-          <TextLookup
-            title={`Genre ${
-              genreIdFilter.length > 0
-                ? ":" + genreLookup.find((x) => x.id === genreIdFilter[0])?.name
-                : ""
-            }`}
-            lookupItems={genreLookup}
-          />
+          <TextLookup title={genreName} lookupItems={genreLookup} />
         </Box>
       </ToggleButtonGroup>
 
@@ -124,7 +131,7 @@ const LibraryPage = () => {
         flexWrap="wrap"
         gap={2}
       >
-        {filteredBooks(books, searchQuery).map((book) => (
+        {filteredBooks(books, searchQuery, genreIdFilter).map((book) => (
           <Box
             key={book.id}
             width={
