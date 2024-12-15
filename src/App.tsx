@@ -12,23 +12,26 @@ import BookPage from "./assets/pages/BookPage/BookPage";
 import ProfilePage from "./assets/pages/ProfilePage/ProfilePage";
 import { ProfileProvider } from "./assets/contexts/ProfileContext";
 import SettingPage from "./assets/pages/SettingPage/SettingPage";
+import { GenreProvider } from "./assets/contexts/GenreContext";
 
 function App() {
   function Root() {
     return (
       <ProfileProvider>
-        <Routes>
-          <Route element={<Layout />}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/read/:bookId" element={<ReadPage />} />
-            <Route path="/create/:bookId" element={<ReadPage />} />
-            <Route path="/library" element={<LibraryPage />} />
-            <Route path="/book/:bookId" element={<BookPage />} />
-            <Route path="/profile/:userId" element={<ProfilePage />} />
-            <Route path="/settings" element={<SettingPage />} />
-            <Route path="/*" element={<ErrorPage />} />
-          </Route>
-        </Routes>
+        <GenreProvider>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/read/:bookId" element={<ReadPage />} />
+              <Route path="/create/:bookId" element={<ReadPage />} />
+              <Route path="/library" element={<LibraryPage />} />
+              <Route path="/book/:bookId" element={<BookPage />} />
+              <Route path="/profile/:userId" element={<ProfilePage />} />
+              <Route path="/settings" element={<SettingPage />} />
+              <Route path="/*" element={<ErrorPage />} />
+            </Route>
+          </Routes>
+        </GenreProvider>
       </ProfileProvider>
     );
   }

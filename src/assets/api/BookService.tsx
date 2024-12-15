@@ -1,4 +1,4 @@
-import { Book } from "../types/types";
+import { Book, BookTopGenre } from "../types/types";
 import { apiClient } from "../utils/supabase";
 
 export type IBookInfoDto = {
@@ -72,6 +72,22 @@ export const getBookInfos = async () => {
     return user;
   } catch (error) {
     console.error("getBookInfos", error);
+    return null;
+  }
+};
+
+export const getTopBooksByGenre = async () => {
+  try {
+    const { data, error } = await apiClient.from("book_top_view").select("*");
+    // .eq("genreid", genreId);
+    if (error) {
+      throw error;
+    }
+    console.log("getTopBooksByGenre", data);
+    const bookChapter = data as BookTopGenre[];
+    return bookChapter;
+  } catch (error) {
+    console.error("getTopBooksByGenre", error);
     return null;
   }
 };

@@ -40,6 +40,14 @@ export type Book = {
   chapters: BookChapter[];
 };
 
+export type BookTopGenre = {
+  id: number;
+  image: string;
+  title: string;
+  author: string;
+  genreid: number;
+};
+
 export type BookFavorite = {
   id?: number;
   bookId: number;
