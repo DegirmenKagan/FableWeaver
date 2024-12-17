@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Box, Typography, Rating, Divider } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { Book, IGenre } from "../../types/types";
@@ -13,6 +13,9 @@ import {
 } from "./BookPage.functions";
 import TextLookup, { ILookupItem } from "../../components/TextLookup";
 
+import { ProfileContext } from "../../contexts/ProfileContext";
+import BookActionButtons from "../../components/BookActionButtons";
+
 const BookPage = () => {
   const { bookId } = useParams();
   const [book, setBook] = useState<Book>(emptyBook);
@@ -22,6 +25,9 @@ const BookPage = () => {
   const [genres, setGenres] = useState<IGenre[]>([]);
   const [booksGenreName, setBooksGenreName] = useState<string>("No Genre");
   const [genreLookup, setGenreLookup] = useState<ILookupItem[]>([]);
+
+  const { profile } = useContext(ProfileContext);
+
   const handleUserRating = (
     event: React.SyntheticEvent,
     value: number | null
@@ -34,7 +40,7 @@ const BookPage = () => {
     if (bookId) {
       const validId = parseInt(bookId);
       if (validId > 0) {
-        doGetBook(validId, setBook, setBooksGenreName);
+        doGetBook(validId, profile.id, setBook, setBooksGenreName);
         doGetBookRating(validId, setBookRating);
         doGetGenres(setGenres);
       }
@@ -94,9 +100,13 @@ const BookPage = () => {
           <Typography variant="body1" paragraph>
             {book.description}
           </Typography>
-
-          <TextLookup title={booksGenreName} lookupItems={genreLookup} />
-
+          <Box mb={3}>
+            <TextLookup title={booksGenreName} lookupItems={genreLookup} />
+          </Box>
+          {/* Book Actions */}
+          <Box mb={3}>
+            <BookActionButtons book={book} setBook={setBook} detailMode />
+          </Box>
           {/* Star Rating */}
           <Box display="flex" alignItems="center" mb={2}>
             <Typography variant="h6" mr={1}>
@@ -111,7 +121,7 @@ const BookPage = () => {
           </Box>
 
           {/* User Rating */}
-          <Box mb={3}>
+          <Box>
             <Typography variant="h6" gutterBottom>
               Your Rating:
             </Typography>

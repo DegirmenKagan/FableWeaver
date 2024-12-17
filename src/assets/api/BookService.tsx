@@ -44,7 +44,7 @@ export const getBooks = async (profileId: number) => {
   }
 };
 
-export const getBook = async (id: number) => {
+export const getBook = async (id: number, profileId: number) => {
   try {
     const { data, error } = await apiClient
       .from("book_view")
@@ -54,7 +54,12 @@ export const getBook = async (id: number) => {
     if (error) {
       throw error;
     }
-    const bookChapter = data as Book;
+    const responseData: IBookView = data as IBookView;
+
+    responseData.favorite = responseData.favoriteuserid
+      ? responseData.favoriteuserid === profileId
+      : false;
+    const bookChapter = responseData as Book;
     return bookChapter;
   } catch (error) {
     console.error("getBook", error);
@@ -102,5 +107,18 @@ export const addBookInfo = async (book: IBookInfoDto) => {
   } catch (error) {
     console.error("addBookInfo", error);
     return null;
+  }
+};
+
+export const deleteBook = async (id: number) => {
+  try {
+    const { error } = await apiClient.from("Book").delete().eq("id", id);
+    if (error) {
+      throw error;
+    }
+    return true;
+  } catch (error) {
+    console.error("deleteBook", error);
+    return false;
   }
 };

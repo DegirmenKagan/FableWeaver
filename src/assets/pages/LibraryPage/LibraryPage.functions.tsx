@@ -1,5 +1,5 @@
 import { NavigateFunction } from "react-router-dom";
-import { Book, BookFavorite, IGenre } from "../../types/types";
+import { Book, IGenre } from "../../types/types";
 import { getBooks } from "../../api/BookService";
 import {
   addBookFavorite,
@@ -100,16 +100,8 @@ export const toggleFavorite = async (
   books: Book[],
   setBooks: React.Dispatch<React.SetStateAction<Book[]>>
 ) => {
-  const newFav: BookFavorite = {
-    bookId,
-    userId,
-  };
-
   if (books.find((x) => x.id === bookId)?.favorite) {
-    const response = await deleteBookFavoriteByBookIdUserId(
-      newFav.bookId,
-      newFav.userId
-    );
+    const response = await deleteBookFavoriteByBookIdUserId(bookId, userId);
     if (response) {
       const updatedBooks = books.map((book) =>
         book.id === bookId ? { ...book, favorite: !book.favorite } : book
@@ -119,7 +111,7 @@ export const toggleFavorite = async (
       alert("Error deleting favorite");
     }
   } else {
-    const response = await addBookFavorite(newFav);
+    const response = await addBookFavorite(bookId, userId);
     if (response) {
       const updatedBooks = books.map((book) =>
         book.id === bookId ? { ...book, favorite: !book.favorite } : book
@@ -196,6 +188,7 @@ export const getLibraryBooks = async (
   const response = await getBooks(profileId);
   if (response) {
     console.log("Fetched books:", response);
+    response.sort((a, b) => (a.title > b.title ? 1 : -1));
     setBooks(response);
   } else {
     console.log("Error fetching books");

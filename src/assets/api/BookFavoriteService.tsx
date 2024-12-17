@@ -40,7 +40,11 @@ import { apiClient } from "../utils/supabase";
 //   }
 // };
 
-export const addBookFavorite = async (fav: BookFavorite) => {
+export const addBookFavorite = async (bookId: number, userId: number) => {
+  const fav: BookFavorite = {
+    bookId: bookId,
+    userId: userId,
+  };
   try {
     const { error } = await apiClient.from("BookFavorite").insert([fav]);
     if (error) {

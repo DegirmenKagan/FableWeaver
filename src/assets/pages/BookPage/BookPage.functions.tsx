@@ -1,17 +1,23 @@
+import { NavigateFunction } from "react-router-dom";
 import {
   addBookRating,
   getBookRatingByBookId,
 } from "../../api/BookRatingService";
-import { getBook } from "../../api/BookService";
+import { deleteBook, getBook } from "../../api/BookService";
 import { getGenres, patchBookGenre } from "../../api/GenreService";
 import { Book, BookRating, IGenre } from "../../types/types";
+import {
+  addBookFavorite,
+  deleteBookFavoriteByBookIdUserId,
+} from "../../api/BookFavoriteService";
 
 export const doGetBook = async (
   bookId: number,
+  profileId: number,
   setBook: React.Dispatch<React.SetStateAction<Book>>,
   setBooksGenreName: React.Dispatch<React.SetStateAction<string>>
 ) => {
-  const response = await getBook(bookId);
+  const response = await getBook(bookId, profileId);
   if (response) {
     console.log(`Fetched books: with ID: ${bookId}`, response);
     const book = response as Book;
@@ -96,5 +102,52 @@ export const doAddUserRating = async (
   if (await doAddBookRating(userRating, bookId, userId)) {
     // guestUser is 1 of 1, use the actual userId
     doGetBookRating(bookId, setBookRating);
+  }
+};
+
+export const doDeleteBook = async (id: number) => {
+  const response = await deleteBook(id);
+  if (response) {
+    console.log(`Deleted book with ID: ${id}`, response);
+    return true;
+  }
+  console.log(`Error deleting book with ID: ${id}`);
+};
+
+export const handleDeleteBook = async (
+  bookId: number,
+  navigate: NavigateFunction
+) => {
+  doDeleteBook(bookId);
+  navigate("/library");
+};
+
+export const doHandleBookFavorite = async (
+  // bookId: number,
+  // bookFavorite: boolean,
+  book: Book,
+  setBook: React.Dispatch<React.SetStateAction<Book>>,
+  userId: number
+) => {
+  if (book.favorite) {
+    const response = await deleteBookFavoriteByBookIdUserId(book.id, userId);
+    if (response) {
+      console.log(`Deleted favorite with bookId: ${book.id}`, response);
+      setBook({ ...book, favorite: !book.favorite });
+      return true;
+    } else {
+      alert("Error deleting favorite");
+      return false;
+    }
+  } else {
+    const response = await addBookFavorite(book.id, userId);
+    if (response) {
+      console.log(`Added favorite with bookId: ${book.id}`, response);
+      setBook({ ...book, favorite: !book.favorite });
+      return true;
+    } else {
+      alert("Error adding favorite");
+      return false;
+    }
   }
 };
