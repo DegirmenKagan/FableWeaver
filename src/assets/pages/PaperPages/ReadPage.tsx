@@ -91,6 +91,8 @@ const ReadPage = () => {
       if (tmpCurDir) {
         console.log("setCurrentBookDirection", tmpCurDir);
         setCurrentBookDirection(tmpCurDir);
+      } else {
+        setCurrentBookDirection({ id: 0, bookId: 0, chapterId: 0 });
       }
     }
   }, [currentPage]);
@@ -335,6 +337,9 @@ const ReadPage = () => {
           bookId={validBookId}
           chapters={chapters}
           currentPage={currentPage}
+          _onAfterOK={() => {
+            doGetBookDirectionByBookId(validBookId, setBookDirectionList);
+          }}
         />
 
         <MessageDialog

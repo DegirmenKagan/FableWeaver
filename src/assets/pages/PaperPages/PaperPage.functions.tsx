@@ -15,6 +15,7 @@ import {
   BookChapter,
   BookDirection,
   IBookChapter,
+  IBookDirection,
 } from "../../types/types";
 
 export const emptyBook: Book = {
@@ -34,6 +35,7 @@ export const handleNextChapter = (
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>,
   chapters: BookChapter[]
 ) => {
+  console.log("current page", currentPage, "chapters length", chapters.length);
   if (currentPage < chapters.length - 1) {
     setCurrentPage(currentPage + 1);
   }
@@ -44,6 +46,7 @@ export const handlePrevChapter = (
   currentPage: number,
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>
 ) => {
+  console.log("current page", currentPage);
   if (currentPage > 0) {
     setCurrentPage(currentPage - 1);
   }
@@ -67,7 +70,10 @@ export const checkUnsavedChapterChanges = (
     markdown.length
     // show differences of two strings;
   );
-  if (chapters[currentPage].content !== markdown) {
+  if (
+    chapters[currentPage].content !== markdown &&
+    chapters[currentPage].content.length - markdown.length > 2 // error happened on first chapter change
+  ) {
     setCheckModalVisible(true);
     setIsNext(isNext);
   } else {
@@ -87,7 +93,10 @@ export const handleChapterClick = (
   setCheckModalVisible: React.Dispatch<React.SetStateAction<boolean>>,
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>
 ) => {
-  if (chapters[currentPage].content !== markdown) {
+  if (
+    chapters[currentPage].content !== markdown &&
+    chapters[currentPage].content.length - markdown.length > 2 // error happened on first chapter change
+  ) {
     setCheckModalVisible(true);
   } else {
     setCurrentPage(chapterId - 1);
@@ -246,7 +255,8 @@ export const doGetBookDirectionByChapterId = async (
 
 export const doSaveBookDirection = async (bookDirection: BookDirection) => {
   if (bookDirection.id === 0) {
-    const response = await addBookDirection(bookDirection);
+    const tmpIBDr: IBookDirection = bookDirection;
+    const response = await addBookDirection(tmpIBDr);
     if (response) {
       console.log("Direction added");
     } else {

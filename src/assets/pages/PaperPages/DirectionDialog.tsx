@@ -7,15 +7,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
-import {
-  Box,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  TextField,
-} from "@mui/material";
+import { SelectChangeEvent } from "@mui/material";
 import { BookChapter, BookDirection } from "../../types/types";
 import { useEffect, useState } from "react";
 import {
@@ -33,66 +25,13 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-const createDirectionDialogItem = (
-  chapters: BookChapter[],
-  chapter: string,
-  handleChapterChange: (event: SelectChangeEvent) => void,
-  handleDescChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-) => {
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        flex: 1,
-        flexDirection: "column",
-      }}
-    >
-      <Box sx={{ flex: 1 }}>
-        <FormControl sx={{ m: 1 }}>
-          {/* Chapter 1 */}
-          <InputLabel id="direction-simple-select-helper-label">
-            Chapter
-          </InputLabel>
-          <Select
-            labelId="direction-simple-select-helper-label"
-            id="direction-simple-select-helper"
-            value={chapter}
-            label="Chapter"
-            onChange={handleChapterChange}
-            sx={{ width: 300 }}
-          >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            {chapters.map((item) => (
-              <MenuItem value={item.id}>{item.title}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Box>
-      <Box sx={{ flex: 1, marginInlineStart: 1 }}>
-        {/* Desc 1 */}
-        <TextField
-          id="standard-basic"
-          label="Description"
-          variant="standard"
-          onChange={handleDescChange}
-          error={chapter !== ""}
-          helperText={chapter !== "" ? "Description is required" : ""}
-          fullWidth
-        />
-      </Box>
-    </Box>
-  );
-};
-
 type IProps = {
   dialogVisible: boolean;
   setDialogVisible: (value: boolean) => void;
   bookId: number;
   chapters: BookChapter[];
   currentPage: number;
-  // _onAddChapter: () => void;
+  _onAfterOK?: () => void;
 };
 const NewChapterDialog = (props: IProps) => {
   // const [open, setOpen] = React.useState(false);
@@ -132,7 +71,7 @@ const NewChapterDialog = (props: IProps) => {
     const chapter1Id = parseInt(chapter1IdStr);
     //check chapter1Id is not NaN
     console.log(chapter1Id, !!chapter1Id, !!desc1);
-    if ((!!chapter1Id && !desc1) || (desc1 && !!chapter1Id)) {
+    if (!(!!chapter1Id && !!desc1)) {
       return;
     }
 
@@ -142,7 +81,7 @@ const NewChapterDialog = (props: IProps) => {
       desc2,
       (!!chapter1Id && !desc2) || (desc2 && !!chapter2Id)
     );
-    if ((!!chapter2Id && !desc2) || (desc2 && !!chapter2Id)) {
+    if (!(!!chapter2Id && !!desc2)) {
       return;
     }
 
@@ -165,7 +104,9 @@ const NewChapterDialog = (props: IProps) => {
       pathTwoDesc: desc2 ?? undefined,
     };
     doSaveBookDirection(tmpBookDirection);
-
+    if (props._onAfterOK) {
+      props._onAfterOK();
+    }
     handleClose();
   };
 
