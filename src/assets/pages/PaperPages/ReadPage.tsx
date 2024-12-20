@@ -34,6 +34,7 @@ import {
   doGetBookChaptersByBookId,
   doGetBookDirectionByBookId,
   handleChapterClick,
+  handleCurrentBookDirection,
   handleDeleteChapter,
   handleNewMarkdown,
   handleNextChapter,
@@ -85,15 +86,12 @@ const ReadPage = () => {
       setTimeout(() => {
         handleNewMarkdown(chapters, currentPage, setMarkdown);
       }, 25);
-      const tmpCurDir = bookDirectionList.find(
-        (x) => x.chapterId === chapters[currentPage].id
+      handleCurrentBookDirection(
+        bookDirectionList,
+        chapters,
+        currentPage,
+        setCurrentBookDirection
       );
-      if (tmpCurDir) {
-        console.log("setCurrentBookDirection", tmpCurDir);
-        setCurrentBookDirection(tmpCurDir);
-      } else {
-        setCurrentBookDirection({ id: 0, bookId: 0, chapterId: 0 });
-      }
     }
   }, [currentPage]);
 
@@ -120,6 +118,17 @@ const ReadPage = () => {
       setIsReadPage(location.pathname.split("/").includes("read"));
     }
   }, [location]);
+
+  useEffect(() => {
+    if (bookDirectionList) {
+      handleCurrentBookDirection(
+        bookDirectionList,
+        chapters,
+        currentPage,
+        setCurrentBookDirection
+      );
+    }
+  }, [bookDirectionList]);
 
   return (
     <Box display="flex" width="100%" height="100vh" p={2}>
@@ -264,7 +273,9 @@ const ReadPage = () => {
                 <Button
                   variant="contained"
                   startIcon={<TurnLeftIcon />}
-                  // onClick={() => setDirectionDialogVisible(true)}
+                  onClick={() =>
+                    setCurrentPage(currentBookDirection.pathOneChapterId! - 1)
+                  }
                 >
                   {currentBookDirection.pathOneDesc}
                 </Button>
@@ -275,7 +286,9 @@ const ReadPage = () => {
                 <Button
                   variant="contained"
                   startIcon={<TurnRightIcon />}
-                  // onClick={() => setDirectionDialogVisible(true)}
+                  onClick={() =>
+                    setCurrentPage(currentBookDirection.pathTwoChapterId! - 1)
+                  }
                 >
                   {currentBookDirection.pathTwoDesc}
                 </Button>

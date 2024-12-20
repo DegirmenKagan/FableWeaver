@@ -271,3 +271,20 @@ export const doSaveBookDirection = async (bookDirection: BookDirection) => {
     }
   }
 };
+
+export const handleCurrentBookDirection = (
+  bookDirectionList: BookDirection[],
+  chapters: BookChapter[],
+  currentPage: number,
+  setCurrentBookDirection: (value: React.SetStateAction<BookDirection>) => void
+) => {
+  const tmpCurDir = bookDirectionList.find(
+    (x) => x.chapterId === (chapters[currentPage]?.id ?? -1)
+  );
+  if (tmpCurDir) {
+    console.log("setCurrentBookDirection", tmpCurDir);
+    setCurrentBookDirection(tmpCurDir);
+  } else {
+    setCurrentBookDirection({ id: 0, bookId: 0, chapterId: 0 });
+  }
+};
