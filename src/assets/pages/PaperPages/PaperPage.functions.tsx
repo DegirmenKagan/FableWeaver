@@ -4,7 +4,18 @@ import {
   getBookChaptersByBookId,
   updateBookChapter,
 } from "../../api/BookChapterService";
-import { Book, BookChapter, IBookChapter } from "../../types/types";
+import {
+  addBookDirection,
+  getBookDirectionByChapterId,
+  getBookDirectionsByBookId,
+  updateBookDirection,
+} from "../../api/BookDirectionService";
+import {
+  Book,
+  BookChapter,
+  BookDirection,
+  IBookChapter,
+} from "../../types/types";
 
 export const emptyBook: Book = {
   id: 0,
@@ -200,5 +211,53 @@ export const doGetBookChaptersByBookId = async (
     setCurrentPage(isNewChapterAdded ? response.length - 1 : 0);
   } else {
     console.log(`Error fetching BookChapters with bookId: ${bookId}`);
+  }
+};
+
+export const doGetBookDirectionByBookId = async (
+  bookId: number,
+  setBookDirectionList: React.Dispatch<React.SetStateAction<BookDirection[]>>
+) => {
+  const response = await getBookDirectionsByBookId(bookId);
+  if (response) {
+    console.log("Directions fetched", response);
+    setBookDirectionList(response);
+  } else {
+    console.log(`Error fetching Directions with bookId: ${bookId}`);
+
+    setBookDirectionList([]);
+  }
+};
+
+export const doGetBookDirectionByChapterId = async (
+  chapterId: number,
+  setBookDirection: React.Dispatch<React.SetStateAction<BookDirection>>
+) => {
+  const response = await getBookDirectionByChapterId(chapterId);
+  if (response) {
+    console.log("Directions fetched", response);
+    setBookDirection(response);
+  } else {
+    console.log(`Error fetching Directions with chapterId: ${chapterId}`);
+
+    setBookDirection({ id: 0, bookId: 0, chapterId: 0 });
+  }
+};
+
+export const doSaveBookDirection = async (bookDirection: BookDirection) => {
+  if (bookDirection.id === 0) {
+    const response = await addBookDirection(bookDirection);
+    if (response) {
+      console.log("Direction added");
+    } else {
+      console.log("Error adding direction");
+    }
+  } else {
+    const response = await updateBookDirection(bookDirection);
+    if (response) {
+      console.log("Direction updated");
+    } else {
+      console.log("Error updating direction");
+    }
   }
 };

@@ -27,6 +27,18 @@ export type BookChapter = {
   chapterId: number;
 };
 
+export type IBookDirection = Omit<BookDirection, "id">; // for inserting purposes
+
+export type BookDirection = {
+  id: number;
+  bookId: number;
+  chapterId: number;
+  pathOneChapterId?: number;
+  pathOneDesc?: string;
+  pathTwoChapterId?: number;
+  pathTwoDesc?: string;
+};
+
 export type Book = {
   id: number;
   image: string;

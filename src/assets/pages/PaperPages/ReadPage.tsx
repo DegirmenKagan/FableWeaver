@@ -10,7 +10,10 @@ import {
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import TurnLeftIcon from "@mui/icons-material/TurnLeft";
+import TurnRightIcon from "@mui/icons-material/TurnRight";
 
+import CallSplitIcon from "@mui/icons-material/CallSplit";
 import "@mdxeditor/editor/style.css";
 import {
   BlockTypeSelect,
@@ -25,10 +28,11 @@ import {
   UndoRedo,
 } from "@mdxeditor/editor";
 import { useLocation, useParams } from "react-router-dom";
-import { BookChapter } from "../../types/types";
+import { BookChapter, BookDirection } from "../../types/types";
 import {
   checkUnsavedChapterChanges,
   doGetBookChaptersByBookId,
+  doGetBookDirectionByBookId,
   handleChapterClick,
   handleDeleteChapter,
   handleNewMarkdown,
@@ -40,6 +44,7 @@ import { StyledPaper } from "../../components/StyledPaper";
 import { Delete, NoteAdd, Save } from "@mui/icons-material";
 import NewChapterDialog from "./NewChapterDialog";
 import MessageDialog from "../../components/MessageDialog";
+import DirectionDialog from "./DirectionDialog";
 
 const ReadPage = () => {
   // State to manage the current page and underlined text
@@ -57,8 +62,21 @@ const ReadPage = () => {
 
   const [newChapterDialogVisible, setNewChapterDialogVisible] =
     useState<boolean>(false);
+  const [directionDialogVisible, setDirectionDialogVisible] =
+    useState<boolean>(false);
   const [checkModalVisible, setCheckModalVisible] = useState<boolean>(false);
+
   const [isNext, setIsNext] = useState<boolean>(false);
+
+  const [bookDirectionList, setBookDirectionList] = useState<BookDirection[]>(
+    []
+  );
+  const [currentBookDirection, setCurrentBookDirection] =
+    useState<BookDirection>({
+      id: 0,
+      bookId: 0,
+      chapterId: 0,
+    });
 
   useEffect(() => {
     if (currentPage >= 0 && currentPage < chapters.length) {
@@ -67,6 +85,13 @@ const ReadPage = () => {
       setTimeout(() => {
         handleNewMarkdown(chapters, currentPage, setMarkdown);
       }, 25);
+      const tmpCurDir = bookDirectionList.find(
+        (x) => x.chapterId === chapters[currentPage].id
+      );
+      if (tmpCurDir) {
+        console.log("setCurrentBookDirection", tmpCurDir);
+        setCurrentBookDirection(tmpCurDir);
+      }
     }
   }, [currentPage]);
 
@@ -83,6 +108,7 @@ const ReadPage = () => {
       if (_validId > 0) {
         setValidBookId(_validId);
         doGetBookChaptersByBookId(_validId, setChapters, setCurrentPage);
+        doGetBookDirectionByBookId(_validId, setBookDirectionList);
       }
     }
   }, [bookId]);
@@ -232,13 +258,39 @@ const ReadPage = () => {
             <></>
           ) : (
             <>
+              {(currentBookDirection.pathOneChapterId ?? 0) > 0 ? (
+                <Button
+                  variant="contained"
+                  startIcon={<TurnLeftIcon />}
+                  // onClick={() => setDirectionDialogVisible(true)}
+                >
+                  {currentBookDirection.pathOneDesc}
+                </Button>
+              ) : (
+                <></>
+              )}
+              {(currentBookDirection.pathTwoChapterId ?? 0) > 0 ? (
+                <Button
+                  variant="contained"
+                  startIcon={<TurnRightIcon />}
+                  // onClick={() => setDirectionDialogVisible(true)}
+                >
+                  {currentBookDirection.pathTwoDesc}
+                </Button>
+              ) : (
+                <></>
+              )}
+              <Button
+                variant="contained"
+                startIcon={<CallSplitIcon />}
+                onClick={() => setDirectionDialogVisible(true)}
+              >
+                Add Direction
+              </Button>
               <Button
                 variant="contained"
                 startIcon={<NoteAdd />}
-                onClick={
-                  () => setNewChapterDialogVisible(true)
-                  // handleNewChapter(validBookId, chapters, setCurrentPage)
-                }
+                onClick={() => setNewChapterDialogVisible(true)}
               >
                 Add Chapter
               </Button>
@@ -275,6 +327,14 @@ const ReadPage = () => {
             doGetBookChaptersByBookId(validBookId, setChapters, setCurrentPage)
           }
           // doGetBookChaptersByBookId(_validId, setChapters, setCurrentPage);
+        />
+
+        <DirectionDialog
+          dialogVisible={directionDialogVisible}
+          setDialogVisible={setDirectionDialogVisible}
+          bookId={validBookId}
+          chapters={chapters}
+          currentPage={currentPage}
         />
 
         <MessageDialog
