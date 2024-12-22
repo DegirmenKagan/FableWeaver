@@ -265,36 +265,40 @@ const ReadPage = () => {
           >
             Next
           </Button>
+          <>
+            {(currentBookDirection.pathOneChapterId ?? 0) > 0 ? (
+              <Button
+                variant="contained"
+                color="secondary"
+                startIcon={<TurnLeftIcon />}
+                onClick={() =>
+                  setCurrentPage(currentBookDirection.pathOneChapterId! - 1)
+                }
+              >
+                {currentBookDirection.pathOneDesc}
+              </Button>
+            ) : (
+              <></>
+            )}
+            {(currentBookDirection.pathTwoChapterId ?? 0) > 0 ? (
+              <Button
+                variant="contained"
+                color="secondary"
+                startIcon={<TurnRightIcon />}
+                onClick={() =>
+                  setCurrentPage(currentBookDirection.pathTwoChapterId! - 1)
+                }
+              >
+                {currentBookDirection.pathTwoDesc}
+              </Button>
+            ) : (
+              <></>
+            )}
+          </>
           {isReadPage ? (
             <></>
           ) : (
             <>
-              {(currentBookDirection.pathOneChapterId ?? 0) > 0 ? (
-                <Button
-                  variant="contained"
-                  startIcon={<TurnLeftIcon />}
-                  onClick={() =>
-                    setCurrentPage(currentBookDirection.pathOneChapterId! - 1)
-                  }
-                >
-                  {currentBookDirection.pathOneDesc}
-                </Button>
-              ) : (
-                <></>
-              )}
-              {(currentBookDirection.pathTwoChapterId ?? 0) > 0 ? (
-                <Button
-                  variant="contained"
-                  startIcon={<TurnRightIcon />}
-                  onClick={() =>
-                    setCurrentPage(currentBookDirection.pathTwoChapterId! - 1)
-                  }
-                >
-                  {currentBookDirection.pathTwoDesc}
-                </Button>
-              ) : (
-                <></>
-              )}
               <Button
                 variant="contained"
                 startIcon={<CallSplitIcon />}
