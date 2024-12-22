@@ -35,7 +35,7 @@ type IProps = {
 };
 const NewChapterDialog = (props: IProps) => {
   // const [open, setOpen] = React.useState(false);
-  const [bookDirection, setBookDirection] = useState<BookDirection>({
+  const [localBookDirection, setLocalBookDirection] = useState<BookDirection>({
     id: 0,
     bookId: props.bookId,
     chapterId: 0,
@@ -95,7 +95,7 @@ const NewChapterDialog = (props: IProps) => {
     );
 
     const tmpBookDirection: BookDirection = {
-      id: bookDirection.id,
+      id: localBookDirection.id,
       bookId: bookId,
       chapterId: chapters[currentPage].id,
       pathOneChapterId: chapter1Id > 0 ? chapter1Id : undefined,
@@ -121,38 +121,41 @@ const NewChapterDialog = (props: IProps) => {
   useEffect(() => {
     if (dialogVisible) {
       const tmpChapter = chapters[currentPage];
-      doGetBookDirectionByChapterId(tmpChapter.id, setBookDirection);
+      doGetBookDirectionByChapterId(tmpChapter.id, setLocalBookDirection);
     } else {
       setChapter1IdStr("");
       setChapter2IdStr("");
       setDesc1("");
       setDesc2("");
+      setLocalBookDirection({ id: 0, bookId: bookId, chapterId: 0 });
     }
   }, [dialogVisible]);
 
   useEffect(() => {
-    if (bookDirection.id > 0) {
-      if (bookDirection.pathOneChapterId) {
+    if (localBookDirection.id > 0) {
+      console.log("bookDirectioAAAAAAAA", localBookDirection);
+      if (localBookDirection.pathOneChapterId) {
         const tmpChp1 = chapters.find(
-          (item) => item.id === bookDirection.pathOneChapterId
+          (item) => item.id === localBookDirection.pathOneChapterId
         );
-        if (tmpChp1) setChapter1IdStr(tmpChp1.title);
+        console.log("tmpChp1", tmpChp1);
+        if (tmpChp1) setChapter1IdStr(tmpChp1.id.toString());
       }
-      if (bookDirection.pathOneDesc) {
-        setDesc1(bookDirection.pathOneDesc);
+      if (localBookDirection.pathOneDesc) {
+        setDesc1(localBookDirection.pathOneDesc);
       }
 
-      if (bookDirection.pathTwoChapterId) {
+      if (localBookDirection.pathTwoChapterId) {
         const tmpChp2 = chapters.find(
-          (item) => item.id === bookDirection.pathTwoChapterId
+          (item) => item.id === localBookDirection.pathTwoChapterId
         );
-        if (tmpChp2) setChapter2IdStr(tmpChp2.title);
+        if (tmpChp2) setChapter2IdStr(tmpChp2.id.toString());
       }
-      if (bookDirection.pathTwoDesc) {
-        setDesc2(bookDirection.pathTwoDesc);
+      if (localBookDirection.pathTwoDesc) {
+        setDesc2(localBookDirection.pathTwoDesc);
       }
     }
-  }, [bookDirection]);
+  }, [localBookDirection]);
 
   return (
     <React.Fragment>
@@ -203,13 +206,15 @@ const NewChapterDialog = (props: IProps) => {
 
           <DirectionDialogItem
             chapters={chapters}
-            chapterStr={chapter1IdStr}
+            chapterIdStr={chapter1IdStr}
+            chapterDesc={desc1}
             handleChapterChange={handleChapter1Change}
             handleDescChange={handleDesc1NameChange}
           />
           <DirectionDialogItem
             chapters={chapters}
-            chapterStr={chapter2IdStr}
+            chapterIdStr={chapter2IdStr}
+            chapterDesc={desc2}
             handleChapterChange={handleChapter2Change}
             handleDescChange={handleDesc2NameChange}
           />

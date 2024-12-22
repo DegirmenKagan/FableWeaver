@@ -12,13 +12,20 @@ import {
 
 type Props = {
   chapters: BookChapter[];
-  chapterStr: string;
+  chapterIdStr: string;
+  chapterDesc: string;
   handleChapterChange: (event: SelectChangeEvent) => void;
   handleDescChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 const DirectionDialogItem = (props: Props) => {
-  const { chapters, chapterStr, handleDescChange, handleChapterChange } = props;
+  const {
+    chapters,
+    chapterIdStr,
+    chapterDesc,
+    handleDescChange,
+    handleChapterChange,
+  } = props;
   return (
     <Box
       sx={{
@@ -36,7 +43,7 @@ const DirectionDialogItem = (props: Props) => {
           <Select
             labelId="direction-simple-select-helper-label"
             id="direction-simple-select-helper"
-            value={chapterStr}
+            value={chapterIdStr}
             label="Chapter"
             onChange={handleChapterChange}
             sx={{ width: 300 }}
@@ -56,9 +63,10 @@ const DirectionDialogItem = (props: Props) => {
           id="standard-basic"
           label="Description"
           variant="standard"
+          value={chapterDesc}
           onChange={handleDescChange}
-          error={chapterStr !== ""}
-          helperText={chapterStr !== "" ? "Description is required" : ""}
+          error={chapterIdStr !== ""}
+          helperText={chapterIdStr !== "" ? "Description is required" : ""}
           fullWidth
         />
       </Box>
