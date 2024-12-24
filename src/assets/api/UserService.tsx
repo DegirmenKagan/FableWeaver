@@ -45,3 +45,21 @@ export const getProfileByEmail = async (email: string) => {
     return undefined;
   }
 };
+
+export const updateProfile = async (user: IUserDto) => {
+  try {
+    const { data, error } = await apiClient
+      .from("User")
+      .update({ username: user.username, name: user.name, avatar: user.avatar })
+      .eq("id", user.id)
+      .select()
+      .single();
+    if (error) {
+      throw error;
+    }
+    return data as IUserDto;
+  } catch (error) {
+    console.error("updateProfile", error);
+    return undefined;
+  }
+};

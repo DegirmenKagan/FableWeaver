@@ -3,7 +3,6 @@ import {
   Box,
   TextField,
   Button,
-  Typography,
   Card,
   CardContent,
   Avatar,
@@ -15,6 +14,7 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { ProfileError } from "../../types/types";
 import { ProfileContext } from "../../contexts/ProfileContext";
 import { doGetProfile, doUpdatePassword } from "./SettingPage.functions";
+import { updateProfile } from "../../api/UserService";
 // import { getProfile } from "../../api/UserService";
 
 const SettingPage = () => {
@@ -26,6 +26,7 @@ const SettingPage = () => {
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordMode, setPasswordMode] = useState<boolean>(false);
 
   const [errors, setErrors] = useState<ProfileError>({});
 
@@ -81,30 +82,32 @@ const SettingPage = () => {
   // Validate the form before saving changes
   const validateForm = () => {
     const newErrors: ProfileError = {};
-    //validate username
-    if (!userData.username) {
-      newErrors.username = "Please enter a username.";
-    }
-    // Validate name
-    if (!userData.name) {
-      newErrors.name = "Please enter your name.";
-    }
+    if (passwordMode) {
+      // Validate email format
+      if (!/\S+@\S+\.\S+/.test(userData.email)) {
+        newErrors.email = "Please enter a valid email address.";
+      }
 
-    // Validate email format
-    if (!/\S+@\S+\.\S+/.test(userData.email)) {
-      newErrors.email = "Please enter a valid email address.";
-    }
+      // Validate old password
+      if (!oldPassword) {
+        newErrors.oldPassword = "Please enter your old password.";
+      }
 
-    // Validate old password
-    if (!oldPassword) {
-      newErrors.oldPassword = "Please enter your old password.";
-    }
-
-    // Validate password and confirm password match
-    if (newPassword && newPassword.length < 8) {
-      newErrors.password = "Password should be at least 8 characters.";
-    } else if (newPassword !== confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match.";
+      // Validate password and confirm password match
+      if (newPassword && newPassword.length < 8) {
+        newErrors.password = "Password should be at least 8 characters.";
+      } else if (newPassword !== confirmPassword) {
+        newErrors.confirmPassword = "Passwords do not match.";
+      }
+    } else {
+      //validate username
+      if (!userData.username) {
+        newErrors.username = "Please enter a username.";
+      }
+      // Validate name
+      if (!userData.name) {
+        newErrors.name = "Please enter your name.";
+      }
     }
 
     setErrors(newErrors);
@@ -116,16 +119,33 @@ const SettingPage = () => {
     console.log(typeof e);
     e.preventDefault();
     if (validateForm()) {
-      const response = await doUpdatePassword(
-        userData.email,
-        oldPassword,
-        newPassword,
-        confirmPassword
-      );
-      if (response) {
-        alert(response.error);
-        return;
+      console.log("userData", userData);
+      if (passwordMode) {
+        if (!oldPassword || !newPassword || !confirmPassword) {
+          const response = await doUpdatePassword(
+            userData.email,
+            oldPassword,
+            newPassword,
+            confirmPassword
+          );
+          if (response) {
+            alert(response.error);
+            return;
+          }
+        }
+      } else {
+        if (
+          userData.username !== profile.username ||
+          userData.name !== profile.name ||
+          userData.avatar !== profile.avatar
+        ) {
+          const response = await updateProfile(userData);
+          if (response) {
+            setProfile(userData);
+          }
+        }
       }
+
       console.log("User Data Updated:", { ...userData, password: newPassword });
       alert("Profile updated successfully!");
     }
@@ -143,7 +163,7 @@ const SettingPage = () => {
       setUserData(profile);
     }
   }, [profile]);
-
+  //TODO: by settings page, save username name to auth table. and also update the user table
   return (
     <Box p={3} display="flex" justifyContent="center">
       <Card sx={{ maxWidth: 500, width: "100%" }}>
@@ -154,118 +174,138 @@ const SettingPage = () => {
             </Avatar>
           </Box>
 
-          <Typography variant="h5" align="center" gutterBottom>
-            Edit Profile
-          </Typography>
+          <Box mt={3} display="flex" justifyContent="center">
+            <Button
+              onClick={() => setPasswordMode(!passwordMode)}
+              variant="contained"
+              color="primary"
+            >
+              {passwordMode ? "Name / Username" : "Email / Password"}
+            </Button>
+          </Box>
 
           <form onSubmit={handleSubmit}>
-            {/* Username */}
-            <TextField
-              fullWidth
-              label="Username"
-              name="username"
-              value={userData.username}
-              onChange={handleInputChange}
-              margin="normal"
-              variant="outlined"
-              error={!!errors.username}
-              helperText={errors.username}
-            />
+            {passwordMode ? (
+              <>
+                {/* Email */}
+                <TextField
+                  fullWidth
+                  label="Email"
+                  name="email"
+                  value={userData.email}
+                  onChange={handleInputChange}
+                  margin="normal"
+                  variant="outlined"
+                  error={!!errors.email}
+                  helperText={errors.email}
+                />
 
-            {/* Name */}
-            <TextField
-              fullWidth
-              label="Name"
-              name="name"
-              value={userData.name}
-              onChange={handleInputChange}
-              margin="normal"
-              variant="outlined"
-              error={!!errors.name}
-              helperText={errors.name}
-            />
+                {/* Password (Old Password) */}
+                <TextField
+                  fullWidth
+                  label="Old Password"
+                  name="oldPassword"
+                  value={oldPassword}
+                  onChange={handlePasswordChange}
+                  margin="normal"
+                  variant="outlined"
+                  type={showOldPassword ? "text" : "password"}
+                  error={!!errors.oldPassword}
+                  helperText={errors.oldPassword}
+                  InputProps={{
+                    endAdornment: (
+                      <IconButton
+                        onClick={() => handleClickShowPassword("oldPassword")}
+                      >
+                        {showOldPassword ? <Visibility /> : <VisibilityOff />}
+                      </IconButton>
+                    ),
+                  }}
+                />
 
-            {/* Email */}
-            <TextField
-              fullWidth
-              label="Email"
-              name="email"
-              value={userData.email}
-              onChange={handleInputChange}
-              margin="normal"
-              variant="outlined"
-              error={!!errors.email}
-              helperText={errors.email}
-            />
+                {/* Password (New Password) */}
+                <TextField
+                  fullWidth
+                  label="New Password"
+                  name="newPassword"
+                  value={newPassword}
+                  onChange={handlePasswordChange}
+                  margin="normal"
+                  variant="outlined"
+                  type={showNewPassword ? "text" : "password"}
+                  error={!!errors.password}
+                  helperText={errors.password}
+                  InputProps={{
+                    endAdornment: (
+                      <IconButton
+                        onClick={() => handleClickShowPassword("newPassword")}
+                      >
+                        {showNewPassword ? <Visibility /> : <VisibilityOff />}
+                      </IconButton>
+                    ),
+                  }}
+                />
 
-            {/* Password (Old Password) */}
-            <TextField
-              fullWidth
-              label="Old Password"
-              name="oldPassword"
-              value={oldPassword}
-              onChange={handlePasswordChange}
-              margin="normal"
-              variant="outlined"
-              type={showOldPassword ? "text" : "password"}
-              error={!!errors.oldPassword}
-              helperText={errors.oldPassword}
-              InputProps={{
-                endAdornment: (
-                  <IconButton
-                    onClick={() => handleClickShowPassword("oldPassword")}
-                  >
-                    {showOldPassword ? <Visibility /> : <VisibilityOff />}
-                  </IconButton>
-                ),
-              }}
-            />
-
-            {/* Password (New Password) */}
-            <TextField
-              fullWidth
-              label="New Password"
-              name="newPassword"
-              value={newPassword}
-              onChange={handlePasswordChange}
-              margin="normal"
-              variant="outlined"
-              type={showNewPassword ? "text" : "password"}
-              error={!!errors.password}
-              helperText={errors.password}
-              InputProps={{
-                endAdornment: (
-                  <IconButton
-                    onClick={() => handleClickShowPassword("newPassword")}
-                  >
-                    {showNewPassword ? <Visibility /> : <VisibilityOff />}
-                  </IconButton>
-                ),
-              }}
-            />
-
-            {/* Confirm Password */}
-            <TextField
-              fullWidth
-              label="Confirm Password"
-              name="confirmPassword"
-              value={confirmPassword}
-              onChange={handlePasswordChange}
-              margin="normal"
-              variant="outlined"
-              type={showConfirmPassword ? "text" : "password"}
-              error={!!errors.confirmPassword}
-              helperText={errors.confirmPassword}
-              InputProps={{
-                endAdornment: (
-                  <IconButton
-                    onClick={() => handleClickShowPassword("confirmPassword")}
-                  >
-                    {showConfirmPassword ? <Visibility /> : <VisibilityOff />}
-                  </IconButton>
-                ),
-              }}
-            />
+                {/* Confirm Password */}
+                <TextField
+                  fullWidth
+                  label="Confirm Password"
+                  name="confirmPassword"
+                  value={confirmPassword}
+                  onChange={handlePasswordChange}
+                  margin="normal"
+                  variant="outlined"
+                  type={showConfirmPassword ? "text" : "password"}
+                  error={!!errors.confirmPassword}
+                  helperText={errors.confirmPassword}
+                  InputProps={{
+                    endAdornment: (
+                      <IconButton
+                        onClick={() =>
+                          handleClickShowPassword("confirmPassword")
+                        }
+                      >
+                        {showConfirmPassword ? (
+                          <Visibility />
+                        ) : (
+                          <VisibilityOff />
+                        )}
+                      </IconButton>
+                    ),
+                  }}
+                />
+              </>
+            ) : (
+              <>
+                {" "}
+                {/* Username */}
+                <TextField
+                  fullWidth
+                  label="Username"
+                  name="username"
+                  value={userData.username}
+                  onChange={handleInputChange}
+                  margin="normal"
+                  variant="outlined"
+                  type="text"
+                  error={!!errors.username}
+                  helperText={errors.username}
+                />
+                {/* Name */}
+                <TextField
+                  fullWidth
+                  label="Name"
+                  name="name"
+                  value={userData.name}
+                  onChange={handleInputChange}
+                  margin="normal"
+                  variant="outlined"
+                  type="text"
+                  error={!!errors.name}
+                  helperText={errors.name}
+                />
+              </>
+            )}
 
             {/* Submit Button */}
             <Box mt={3} display="flex" justifyContent="center">
