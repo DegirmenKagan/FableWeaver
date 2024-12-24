@@ -14,10 +14,11 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { ProfileError } from "../../types/types";
 import { ProfileContext } from "../../contexts/ProfileContext";
+import { doGetProfile, doUpdatePassword } from "./SettingPage.functions";
 // import { getProfile } from "../../api/UserService";
 
 const SettingPage = () => {
-  const { profile } = useContext(ProfileContext);
+  const { profile, setProfile } = useContext(ProfileContext);
   const [userData, setUserData] = useState(profile);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -28,9 +29,9 @@ const SettingPage = () => {
 
   const [errors, setErrors] = useState<ProfileError>({});
 
-  // const handleGetProfile = () => {
-  //   getProfile();
-  // };
+  const handleGetProfile = () => {
+    doGetProfile(setProfile);
+  };
 
   // Handle input change for email, name, and password
   const handleInputChange = (
@@ -111,19 +112,37 @@ const SettingPage = () => {
   };
 
   // Handle form submission for updating user information
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     console.log(typeof e);
     e.preventDefault();
     if (validateForm()) {
-      // Save changes logic (could be an API call)
+      const response = await doUpdatePassword(
+        userData.email,
+        oldPassword,
+        newPassword,
+        confirmPassword
+      );
+      if (response) {
+        alert(response.error);
+        return;
+      }
       console.log("User Data Updated:", { ...userData, password: newPassword });
       alert("Profile updated successfully!");
     }
   };
 
   useEffect(() => {
-    // handleGetProfile();
+    if (profile.id === 0) {
+      handleGetProfile();
+    }
   }, []);
+
+  useEffect(() => {
+    if (profile) {
+      console.log(profile);
+      setUserData(profile);
+    }
+  }, [profile]);
 
   return (
     <Box p={3} display="flex" justifyContent="center">

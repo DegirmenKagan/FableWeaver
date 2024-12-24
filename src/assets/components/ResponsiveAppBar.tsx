@@ -17,10 +17,11 @@ import { useNavigate } from "react-router-dom";
 import { ProfileContext } from "../contexts/ProfileContext";
 import { useContext, useEffect, useState } from "react";
 import AuthDialog from "./AuthDialog";
+import { logout } from "../api/AuthService";
 
 function ResponsiveAppBar() {
   const navigate = useNavigate();
-  const { profile } = useContext(ProfileContext);
+  const { profile, setProfile } = useContext(ProfileContext);
 
   const pages = ["Home", "Library"];
   const settings = ["Home", "Profile", "Settings", "Logout"];
@@ -57,9 +58,13 @@ function ResponsiveAppBar() {
         selectionStr === "Logout" ||
         selectionStr == "Register"
       ) {
-        setIsAuthLogin(selectionStr === "Login");
-        console.log("selectionlogin", selectionStr === "Login");
-        setAuthModalOpen(true);
+        if (selectionStr === "Logout") {
+          logout(setProfile);
+        } else {
+          setIsAuthLogin(selectionStr === "Login");
+          console.log("selectionlogin", selectionStr === "Login");
+          setAuthModalOpen(true);
+        }
       } else {
         navigate(`${selectionStr.toLowerCase()}`);
       }
@@ -71,6 +76,7 @@ function ResponsiveAppBar() {
   };
 
   useEffect(() => {
+    console.log(profile, profile.id, "profile");
     if (profile.id === 0) {
       setSettingList(settingsGuest);
     } else {

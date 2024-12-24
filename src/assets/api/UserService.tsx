@@ -10,7 +10,7 @@ export type IUserDto = {
   avatar: string;
 };
 
-export const getProfile = async (userId: number) => {
+export const getProfileById = async (userId: number) => {
   try {
     const { data, error } = await apiClient
       .from("User")
@@ -23,7 +23,25 @@ export const getProfile = async (userId: number) => {
     const user = data as IUserDto;
     return user;
   } catch (error) {
-    console.error("getProfile", error);
+    console.error("getProfileById", error);
+    return undefined;
+  }
+};
+
+export const getProfileByEmail = async (email: string) => {
+  try {
+    const { data, error } = await apiClient
+      .from("User")
+      .select("*")
+      .eq("email", email)
+      .single();
+    if (error) {
+      throw error;
+    }
+    const user = data as IUserDto;
+    return user;
+  } catch (error) {
+    console.error("getProfileByEmail", error);
     return undefined;
   }
 };

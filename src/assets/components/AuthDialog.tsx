@@ -6,12 +6,13 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { useEffect } from "react";
-import { register } from "../api/Api";
+import { useContext, useEffect } from "react";
+import { login, register } from "../api/AuthService";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import Input from "@mui/material/Input";
+import { ProfileContext } from "../contexts/ProfileContext";
 
 type AuthDialogProps = {
   open: boolean;
@@ -22,6 +23,7 @@ type AuthDialogProps = {
 
 export default function AuthDialog(props: AuthDialogProps) {
   const { open, setOpen } = props;
+  const { setProfile } = useContext(ProfileContext);
   const [isLogin, setIsLogin] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
 
@@ -55,7 +57,17 @@ export default function AuthDialog(props: AuthDialogProps) {
     if (isLogin) {
       const { email, password } = formJson;
       console.log("Login data:", { email, password });
-      // Implement login functionality here
+      const loggedInUser = await login(email.toString(), password.toString());
+      if (loggedInUser) {
+        setProfile(loggedInUser);
+      }
+      if (loggedInUser?.email) {
+        alert(`Welcome back, ${loggedInUser.email}!`);
+        handleClose();
+      }
+      // else {
+      //   alert("Login failed.");
+      // }
     } else {
       const { email, password, confirmPassword } = formJson;
       if (password !== confirmPassword) {
@@ -70,12 +82,13 @@ export default function AuthDialog(props: AuthDialogProps) {
       );
       if (registeredUser?.email) {
         alert(`Registration successful. Welcome, ${registeredUser.email}!`);
+        setIsLogin(true);
+        return;
       } else {
         alert("Registration failed.");
+        return;
       }
     }
-
-    handleClose();
   };
 
   useEffect(() => {
@@ -107,7 +120,7 @@ export default function AuthDialog(props: AuthDialogProps) {
             margin="dense"
             id="email"
             name="email"
-            label="Email Address"
+            placeholder="Email Address"
             type="email"
             fullWidth
             variant="standard"
@@ -118,6 +131,7 @@ export default function AuthDialog(props: AuthDialogProps) {
             margin="dense"
             fullWidth
             type={showPassword ? "text" : "password"}
+            placeholder="Password"
             endAdornment={
               <InputAdornment position="end">
                 <IconButton
@@ -140,6 +154,7 @@ export default function AuthDialog(props: AuthDialogProps) {
               margin="dense"
               fullWidth
               type={showPassword ? "text" : "password"}
+              placeholder="Confirm Password"
               endAdornment={
                 <InputAdornment position="end">
                   <IconButton
@@ -166,7 +181,7 @@ export default function AuthDialog(props: AuthDialogProps) {
             {isLogin ? "Need an account? Register" : "Have an account? Login"}
           </Button>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit">{isLogin ? "Login" : "Register"}</Button>
+          <Button type="submit">Submit</Button>
         </DialogActions>
       </Dialog>
     </>
