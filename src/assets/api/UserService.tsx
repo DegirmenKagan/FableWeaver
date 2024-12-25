@@ -63,3 +63,21 @@ export const updateProfile = async (user: IUserDto) => {
     return undefined;
   }
 };
+
+export const patchAvatar = async (userId: number, avatar: string) => {
+  try {
+    const { data, error } = await apiClient
+      .from("User")
+      .update({ avatar })
+      .eq("id", userId)
+      .select()
+      .single();
+    if (error) {
+      throw error;
+    }
+    return data as IUserDto;
+  } catch (error) {
+    console.error("patchAvatar", error);
+    return undefined;
+  }
+};

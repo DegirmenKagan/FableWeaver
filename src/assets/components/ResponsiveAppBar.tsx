@@ -77,10 +77,10 @@ function ResponsiveAppBar() {
 
   useEffect(() => {
     console.log(profile, profile.id, "profile");
-    if (profile.id === 0) {
-      setSettingList(settingsGuest);
-    } else {
+    if (profile.id > 1) {
       setSettingList(settings);
+    } else {
+      setSettingList(settingsGuest);
     }
   }, [profile]);
 

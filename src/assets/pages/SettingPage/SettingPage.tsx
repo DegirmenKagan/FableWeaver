@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import {
   Box,
   TextField,
@@ -14,7 +14,9 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { ProfileError } from "../../types/types";
 import { ProfileContext } from "../../contexts/ProfileContext";
 import { doGetProfile, doUpdatePassword } from "./SettingPage.functions";
-import { updateProfile } from "../../api/UserService";
+import { patchAvatar, updateProfile } from "../../api/UserService";
+import AuthDialog from "../../components/AuthDialog";
+import { convertBase64 } from "../../components/StringFormat";
 // import { getProfile } from "../../api/UserService";
 
 const SettingPage = () => {
@@ -27,8 +29,10 @@ const SettingPage = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordMode, setPasswordMode] = useState<boolean>(false);
+  const fileUploadRef = useRef<HTMLInputElement>(null);
 
   const [errors, setErrors] = useState<ProfileError>({});
+  const [open, setOpen] = useState<boolean>(false);
 
   const handleGetProfile = () => {
     doGetProfile(setProfile);
@@ -150,10 +154,56 @@ const SettingPage = () => {
       alert("Profile updated successfully!");
     }
   };
+  const handleAvatarSubmit = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    fileUploadRef.current?.click();
+  };
+
+  const uploadAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("go", e);
+    const upFiles = fileUploadRef.current?.files;
+    if (!upFiles) {
+      alert("Image couldn't uploaded");
+      return;
+    }
+    const firstFileName = upFiles[0];
+    // const cachedURL = URL.createObjectURL(firstFileName);
+    // setUserData({ ...userData, avatar: firstFileName.name });
+
+    // const newAvatar = await convertBase64(firstFileName);
+    // console.log("cachedURL", newAvatar);
+    const newAvatar = firstFileName;
+    const b64Image = await convertBase64(newAvatar);
+    // if (b64Image) {
+    //   console.log("b64Image", b64Image);
+    //   setUserData({ ...userData, avatar: b64Image ?? "" });
+    // }
+
+    const response = await patchAvatar(profile.id, b64Image);
+    if (response) {
+      setProfile(response);
+    }
+
+    // if (e.target.files) {
+    //   const file = e.target.files[0];
+    //   const formData = new FormData();
+    //   formData.append("avatar", file);
+    //   console.log(file.name);
+    //   const response = await patchAvatar(profile.id, file.name);
+    //   if (response) {
+    //     setProfile(response);
+    //   }
+    // }
+  };
 
   useEffect(() => {
     if (profile.id === 0) {
       handleGetProfile();
+    }
+    if (profile.id === 1) {
+      setOpen(true);
     }
   }, []);
 
@@ -165,158 +215,203 @@ const SettingPage = () => {
   }, [profile]);
   //TODO: by settings page, save username name to auth table. and also update the user table
   return (
-    <Box p={3} display="flex" justifyContent="center">
-      <Card sx={{ maxWidth: 500, width: "100%" }}>
-        <CardContent>
-          <Box display="flex" justifyContent="center" mb={3}>
-            <Avatar sx={{ bgcolor: deepOrange[500], width: 100, height: 100 }}>
-              {userData.name.charAt(0)}
-            </Avatar>
-          </Box>
+    <>
+      {profile.id === 1 ? ( // If user is not logged in, show the login dialog
+        <AuthDialog open={open} setOpen={setOpen} />
+      ) : (
+        <Box p={3} display="flex" justifyContent="center">
+          <Card sx={{ maxWidth: 500, width: "100%" }}>
+            <CardContent>
+              <Box display="flex" justifyContent="center" mb={3}>
+                {/* make avatar a file upload */}
 
-          <Box mt={3} display="flex" justifyContent="center">
-            <Button
-              onClick={() => setPasswordMode(!passwordMode)}
-              variant="contained"
-              color="primary"
-            >
-              {passwordMode ? "Name / Username" : "Email / Password"}
-            </Button>
-          </Box>
+                <form id="avatar-form" encType="multipart/form-data">
+                  <Button
+                    sx={{
+                      backgroundColor: "red",
+                      borderRadius: 50,
+                      width: 100,
+                      height: 100,
+                    }}
+                    type="submit"
+                    onClick={(e) => handleAvatarSubmit(e)}
+                  >
+                    <Avatar
+                      sx={{ bgcolor: deepOrange[500], width: 100, height: 100 }}
+                      src={
+                        userData.avatar.length > 0
+                          ? userData.avatar
+                          : userData.name.charAt(0)
+                      }
+                    />
+                  </Button>
+                  <input
+                    type="file"
+                    id="avatar-file"
+                    ref={fileUploadRef}
+                    hidden
+                    onChange={(e) => uploadAvatar(e)}
+                  />
+                </form>
+              </Box>
 
-          <form onSubmit={handleSubmit}>
-            {passwordMode ? (
-              <>
-                {/* Email */}
-                <TextField
-                  fullWidth
-                  label="Email"
-                  name="email"
-                  value={userData.email}
-                  onChange={handleInputChange}
-                  margin="normal"
-                  variant="outlined"
-                  error={!!errors.email}
-                  helperText={errors.email}
-                />
+              <Box mt={3} display="flex" justifyContent="center">
+                <Button
+                  onClick={() => setPasswordMode(!passwordMode)}
+                  variant="contained"
+                  color="primary"
+                >
+                  {passwordMode ? "Name / Username" : "Email / Password"}
+                </Button>
+              </Box>
 
-                {/* Password (Old Password) */}
-                <TextField
-                  fullWidth
-                  label="Old Password"
-                  name="oldPassword"
-                  value={oldPassword}
-                  onChange={handlePasswordChange}
-                  margin="normal"
-                  variant="outlined"
-                  type={showOldPassword ? "text" : "password"}
-                  error={!!errors.oldPassword}
-                  helperText={errors.oldPassword}
-                  InputProps={{
-                    endAdornment: (
-                      <IconButton
-                        onClick={() => handleClickShowPassword("oldPassword")}
-                      >
-                        {showOldPassword ? <Visibility /> : <VisibilityOff />}
-                      </IconButton>
-                    ),
-                  }}
-                />
+              <form onSubmit={handleSubmit}>
+                {passwordMode ? (
+                  <>
+                    {/* Email */}
+                    <TextField
+                      fullWidth
+                      label="Email"
+                      name="email"
+                      value={userData.email}
+                      onChange={handleInputChange}
+                      margin="normal"
+                      variant="outlined"
+                      error={!!errors.email}
+                      helperText={errors.email}
+                    />
 
-                {/* Password (New Password) */}
-                <TextField
-                  fullWidth
-                  label="New Password"
-                  name="newPassword"
-                  value={newPassword}
-                  onChange={handlePasswordChange}
-                  margin="normal"
-                  variant="outlined"
-                  type={showNewPassword ? "text" : "password"}
-                  error={!!errors.password}
-                  helperText={errors.password}
-                  InputProps={{
-                    endAdornment: (
-                      <IconButton
-                        onClick={() => handleClickShowPassword("newPassword")}
-                      >
-                        {showNewPassword ? <Visibility /> : <VisibilityOff />}
-                      </IconButton>
-                    ),
-                  }}
-                />
+                    {/* Password (Old Password) */}
+                    <TextField
+                      fullWidth
+                      label="Old Password"
+                      name="oldPassword"
+                      value={oldPassword}
+                      onChange={handlePasswordChange}
+                      margin="normal"
+                      variant="outlined"
+                      type={showOldPassword ? "text" : "password"}
+                      error={!!errors.oldPassword}
+                      helperText={errors.oldPassword}
+                      InputProps={{
+                        endAdornment: (
+                          <IconButton
+                            onClick={() =>
+                              handleClickShowPassword("oldPassword")
+                            }
+                          >
+                            {showOldPassword ? (
+                              <Visibility />
+                            ) : (
+                              <VisibilityOff />
+                            )}
+                          </IconButton>
+                        ),
+                      }}
+                    />
 
-                {/* Confirm Password */}
-                <TextField
-                  fullWidth
-                  label="Confirm Password"
-                  name="confirmPassword"
-                  value={confirmPassword}
-                  onChange={handlePasswordChange}
-                  margin="normal"
-                  variant="outlined"
-                  type={showConfirmPassword ? "text" : "password"}
-                  error={!!errors.confirmPassword}
-                  helperText={errors.confirmPassword}
-                  InputProps={{
-                    endAdornment: (
-                      <IconButton
-                        onClick={() =>
-                          handleClickShowPassword("confirmPassword")
-                        }
-                      >
-                        {showConfirmPassword ? (
-                          <Visibility />
-                        ) : (
-                          <VisibilityOff />
-                        )}
-                      </IconButton>
-                    ),
-                  }}
-                />
-              </>
-            ) : (
-              <>
-                {" "}
-                {/* Username */}
-                <TextField
-                  fullWidth
-                  label="Username"
-                  name="username"
-                  value={userData.username}
-                  onChange={handleInputChange}
-                  margin="normal"
-                  variant="outlined"
-                  type="text"
-                  error={!!errors.username}
-                  helperText={errors.username}
-                />
-                {/* Name */}
-                <TextField
-                  fullWidth
-                  label="Name"
-                  name="name"
-                  value={userData.name}
-                  onChange={handleInputChange}
-                  margin="normal"
-                  variant="outlined"
-                  type="text"
-                  error={!!errors.name}
-                  helperText={errors.name}
-                />
-              </>
-            )}
+                    {/* Password (New Password) */}
+                    <TextField
+                      fullWidth
+                      label="New Password"
+                      name="newPassword"
+                      value={newPassword}
+                      onChange={handlePasswordChange}
+                      margin="normal"
+                      variant="outlined"
+                      type={showNewPassword ? "text" : "password"}
+                      error={!!errors.password}
+                      helperText={errors.password}
+                      InputProps={{
+                        endAdornment: (
+                          <IconButton
+                            onClick={() =>
+                              handleClickShowPassword("newPassword")
+                            }
+                          >
+                            {showNewPassword ? (
+                              <Visibility />
+                            ) : (
+                              <VisibilityOff />
+                            )}
+                          </IconButton>
+                        ),
+                      }}
+                    />
 
-            {/* Submit Button */}
-            <Box mt={3} display="flex" justifyContent="center">
-              <Button type="submit" variant="contained" color="primary">
-                Save Changes
-              </Button>
-            </Box>
-          </form>
-        </CardContent>
-      </Card>
-    </Box>
+                    {/* Confirm Password */}
+                    <TextField
+                      fullWidth
+                      label="Confirm Password"
+                      name="confirmPassword"
+                      value={confirmPassword}
+                      onChange={handlePasswordChange}
+                      margin="normal"
+                      variant="outlined"
+                      type={showConfirmPassword ? "text" : "password"}
+                      error={!!errors.confirmPassword}
+                      helperText={errors.confirmPassword}
+                      InputProps={{
+                        endAdornment: (
+                          <IconButton
+                            onClick={() =>
+                              handleClickShowPassword("confirmPassword")
+                            }
+                          >
+                            {showConfirmPassword ? (
+                              <Visibility />
+                            ) : (
+                              <VisibilityOff />
+                            )}
+                          </IconButton>
+                        ),
+                      }}
+                    />
+                  </>
+                ) : (
+                  <>
+                    {" "}
+                    {/* Username */}
+                    <TextField
+                      fullWidth
+                      label="Username"
+                      name="username"
+                      value={userData.username}
+                      onChange={handleInputChange}
+                      margin="normal"
+                      variant="outlined"
+                      type="text"
+                      error={!!errors.username}
+                      helperText={errors.username}
+                    />
+                    {/* Name */}
+                    <TextField
+                      fullWidth
+                      label="Name"
+                      name="name"
+                      value={userData.name}
+                      onChange={handleInputChange}
+                      margin="normal"
+                      variant="outlined"
+                      type="text"
+                      error={!!errors.name}
+                      helperText={errors.name}
+                    />
+                  </>
+                )}
+
+                {/* Submit Button */}
+                <Box mt={3} display="flex" justifyContent="center">
+                  <Button type="submit" variant="contained" color="primary">
+                    Save Changes
+                  </Button>
+                </Box>
+              </form>
+            </CardContent>
+          </Card>
+        </Box>
+      )}
+    </>
   );
 };
 

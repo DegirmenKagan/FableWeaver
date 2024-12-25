@@ -1,6 +1,5 @@
-import { User } from "@supabase/supabase-js";
 import { apiClient } from "../utils/supabase";
-import { getProfileByEmail, getProfileById, IUserDto } from "./UserService";
+import { getProfileByEmail, IUserDto } from "./UserService";
 
 export const login = async (
   email: string,
