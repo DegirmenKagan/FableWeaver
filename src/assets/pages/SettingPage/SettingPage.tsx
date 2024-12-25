@@ -17,7 +17,6 @@ import { doGetProfile, doUpdatePassword } from "./SettingPage.functions";
 import { patchAvatar, updateProfile } from "../../api/UserService";
 import AuthDialog from "../../components/AuthDialog";
 import { convertBase64 } from "../../components/StringFormat";
-// import { getProfile } from "../../api/UserService";
 
 const SettingPage = () => {
   const { profile, setProfile } = useContext(ProfileContext);
@@ -169,33 +168,13 @@ const SettingPage = () => {
       return;
     }
     const firstFileName = upFiles[0];
-    // const cachedURL = URL.createObjectURL(firstFileName);
-    // setUserData({ ...userData, avatar: firstFileName.name });
-
-    // const newAvatar = await convertBase64(firstFileName);
-    // console.log("cachedURL", newAvatar);
     const newAvatar = firstFileName;
     const b64Image = await convertBase64(newAvatar);
-    // if (b64Image) {
-    //   console.log("b64Image", b64Image);
-    //   setUserData({ ...userData, avatar: b64Image ?? "" });
-    // }
 
     const response = await patchAvatar(profile.id, b64Image);
     if (response) {
       setProfile(response);
     }
-
-    // if (e.target.files) {
-    //   const file = e.target.files[0];
-    //   const formData = new FormData();
-    //   formData.append("avatar", file);
-    //   console.log(file.name);
-    //   const response = await patchAvatar(profile.id, file.name);
-    //   if (response) {
-    //     setProfile(response);
-    //   }
-    // }
   };
 
   useEffect(() => {
