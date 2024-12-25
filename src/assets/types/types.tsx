@@ -1,13 +1,3 @@
-export type User = {
-  id: number;
-  createdAt: Date;
-  name: string;
-  username: string;
-  password: string;
-  email: string;
-  avatar: string;
-};
-
 export type ProfileError = {
   username?: string;
   name?: string;
@@ -96,4 +86,15 @@ export type ICommentDto = {
 export type IGenre = {
   id: number;
   name: string;
+};
+
+export type IUserAchievementDto = {
+  id: number;
+  userId: number;
+  achievementId: number;
+  genreid: number;
+  name: string;
+  rarityId: number;
+  collectionId: number;
+  description: string;
 };

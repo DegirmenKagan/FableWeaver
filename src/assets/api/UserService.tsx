@@ -8,6 +8,7 @@ export type IUserDto = {
   // password: string;
   email: string;
   avatar: string;
+  bio?: string;
 };
 
 export const getProfileById = async (userId: number) => {
@@ -78,6 +79,24 @@ export const patchAvatar = async (userId: number, avatar: string) => {
     return data as IUserDto;
   } catch (error) {
     console.error("patchAvatar", error);
+    return undefined;
+  }
+};
+
+export const patchBioByUserId = async (userId: number, bio: string) => {
+  try {
+    const { data, error } = await apiClient
+      .from("User")
+      .update({ bio })
+      .eq("id", userId)
+      .select()
+      .single();
+    if (error) {
+      throw error;
+    }
+    return data as IUserDto;
+  } catch (error) {
+    console.error("patchBioByUserId", error);
     return undefined;
   }
 };

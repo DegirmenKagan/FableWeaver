@@ -34,3 +34,9 @@ export const doUpdatePassword = async (
   }
   updatePassword(email, newPassword);
 };
+
+export const handleGetProfile = (
+  setProfile: React.Dispatch<React.SetStateAction<IUserDto>>
+) => {
+  doGetProfile(setProfile);
+};

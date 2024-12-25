@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Box,
   Avatar,
@@ -8,28 +8,21 @@ import {
   Button,
   Divider,
   IconButton,
-  Chip,
 } from "@mui/material";
 import { deepOrange } from "@mui/material/colors";
 import EditIcon from "@mui/icons-material/Edit";
-import BadgeIcon from "@mui/icons-material/Verified";
 import { ProfileContext } from "../../contexts/ProfileContext";
+import { patchBioByUserId } from "../../api/UserService";
+import AuthDialog from "../../components/AuthDialog";
 
 // Sample user data (replace with data from your API or props)
-const userData = {
-  name: "Jane Doe",
-  email: "janedoe@example.com",
-  joinDate: "2023-01-15",
-  description: "Avid reader, writer, and traveler. Loves technology and art.",
-  avatarUrl: "https://via.placeholder.com/150",
-  badges: ["Top Contributor", "Early Adopter", "Bookworm"],
-};
 
 const ProfilePage = () => {
-  const { profile } = useContext(ProfileContext);
+  const { profile, setProfile } = useContext(ProfileContext);
 
   const [editingDescription, setEditingDescription] = useState(false);
-  const [description, setDescription] = useState(userData.description);
+  const [localBio, setLocalBio] = useState(profile.bio ?? "");
+  const [open, setOpen] = useState<boolean>(false);
 
   // Toggles edit mode for the description
   const handleEditDescription = () => {
@@ -37,87 +30,126 @@ const ProfilePage = () => {
   };
 
   // Handles description change
-  const handleDescriptionChange = (event) => {
-    setDescription(event.target.value);
+  const handleDescriptionChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    setLocalBio(event.target.value);
   };
 
-  // Function to display join date in a readable format
-  const formatDate = (dateString: string) => {
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    return new Date(dateString).toLocaleDateString(undefined, options);
+  const handleBioSave = async () => {
+    const response = await patchBioByUserId(profile.id, localBio);
+    if (response) {
+      setProfile(response);
+    }
+    setEditingDescription(false);
   };
+
+  useEffect(() => {
+    if (profile.id < 2) {
+      setOpen(true);
+    } else {
+      console.log(profile.bio, "profile.bio");
+      setLocalBio(profile.bio ?? "");
+      // getBadgesByUserId(); //todo implement this function
+    }
+  }, []);
 
   return (
-    <Box p={3} display="flex" justifyContent="center">
-      <Card sx={{ maxWidth: 600, width: "100%" }}>
-        <CardContent>
-          {/* User Avatar and Name */}
-          <Box display="flex" flexDirection="column" alignItems="center" mb={3}>
-            <Avatar
-              src={userData.avatarUrl}
-              alt={userData.name}
-              sx={{ width: 120, height: 120, bgcolor: deepOrange[500] }}
-            />
-            <Typography variant="h4" mt={2}>
-              {userData.name}
-            </Typography>
-            <Typography variant="body1" color="textSecondary">
-              {userData.email}
-            </Typography>
-            <Typography variant="body2" color="textSecondary">
-              Joined on {formatDate(userData.joinDate)}
-            </Typography>
-          </Box>
-
-          <Divider sx={{ my: 3 }} />
-
-          {/* Description Section */}
-          <Box mb={3}>
-            <Box
-              display="flex"
-              alignItems="center"
-              justifyContent="space-between"
-            >
-              <Typography variant="h6">About Me</Typography>
-              <IconButton size="small" onClick={handleEditDescription}>
-                <EditIcon fontSize="small" />
-              </IconButton>
-            </Box>
-            {editingDescription ? (
-              <Box>
-                <textarea
-                  rows={4}
-                  value={description}
-                  onChange={handleDescriptionChange}
-                  style={{ width: "100%", padding: "8px", fontSize: "16px" }}
+    <>
+      {profile.id === 1 ? ( // If user is not logged in, show the login dialog
+        <AuthDialog open={open} setOpen={setOpen} />
+      ) : (
+        <Box p={3} display="flex" justifyContent="center">
+          <Card sx={{ maxWidth: 600, width: "100%" }}>
+            <CardContent>
+              {/* User Avatar and Name */}
+              <Box
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                mb={3}
+              >
+                <Avatar
+                  src={profile.avatar}
+                  alt={profile.name}
+                  sx={{ width: 120, height: 120, bgcolor: deepOrange[500] }}
                 />
-                <Box display="flex" justifyContent="flex-end" mt={1}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    size="small"
-                    onClick={() => setEditingDescription(false)}
-                  >
-                    Save
-                  </Button>
-                </Box>
+                <Typography variant="h4" mt={2}>
+                  {profile.name}
+                </Typography>
+                <Typography variant="body1" color="textSecondary">
+                  {profile.email}
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  {/* Joined on {formatDate(profile.joinDate)} */}
+                </Typography>
               </Box>
-            ) : (
-              <Typography variant="body1" mt={1}>
-                {description}
-              </Typography>
-            )}
-          </Box>
 
-          <Divider sx={{ my: 3 }} />
+              <Divider sx={{ my: 3 }} />
 
-          {/* Badges Section */}
-          <Box mb={3}>
-            <Typography variant="h6" gutterBottom>
-              Badges
-            </Typography>
-            <Box display="flex" flexWrap="wrap" gap={1}>
-              {userData.badges.map((badge, index) => (
+              {/* Description Section */}
+              <Box mb={3}>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <Typography variant="h6">About Me</Typography>
+                  {editingDescription ? (
+                    <></>
+                  ) : (
+                    <IconButton size="small" onClick={handleEditDescription}>
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                  )}
+                </Box>
+                {editingDescription ? (
+                  <Box>
+                    <textarea
+                      rows={4}
+                      value={localBio}
+                      onChange={(e) => handleDescriptionChange(e)}
+                      style={{
+                        width: "100%",
+                        padding: "8px",
+                        fontSize: "16px",
+                      }}
+                    />
+                    <Box display="flex" justifyContent="flex-end" mt={1}>
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        size="small"
+                        onClick={handleEditDescription}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        size="small"
+                        onClick={handleBioSave}
+                      >
+                        Save
+                      </Button>
+                    </Box>
+                  </Box>
+                ) : (
+                  <Typography variant="body1" mt={1}>
+                    {localBio}
+                  </Typography>
+                )}
+              </Box>
+
+              <Divider sx={{ my: 3 }} />
+
+              {/* Badges Section */}
+              <Box mb={3}>
+                <Typography variant="h6" gutterBottom>
+                  Badges
+                </Typography>
+                <Box display="flex" flexWrap="wrap" gap={1}>
+                  {/* {profile.badges.map((badge, index) => (
                 <Chip
                   key={index}
                   label={badge}
@@ -125,12 +157,14 @@ const ProfilePage = () => {
                   color="primary"
                   variant="outlined"
                 />
-              ))}
-            </Box>
-          </Box>
-        </CardContent>
-      </Card>
-    </Box>
+              ))} */}
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Box>
+      )}
+    </>
   );
 };
 

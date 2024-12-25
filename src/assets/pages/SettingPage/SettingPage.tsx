@@ -13,7 +13,7 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { ProfileError } from "../../types/types";
 import { ProfileContext } from "../../contexts/ProfileContext";
-import { doGetProfile, doUpdatePassword } from "./SettingPage.functions";
+import { doUpdatePassword } from "./SettingPage.functions";
 import { patchAvatar, updateProfile } from "../../api/UserService";
 import AuthDialog from "../../components/AuthDialog";
 import { convertBase64 } from "../../components/StringFormat";
@@ -32,10 +32,6 @@ const SettingPage = () => {
 
   const [errors, setErrors] = useState<ProfileError>({});
   const [open, setOpen] = useState<boolean>(false);
-
-  const handleGetProfile = () => {
-    doGetProfile(setProfile);
-  };
 
   // Handle input change for email, name, and password
   const handleInputChange = (
@@ -178,10 +174,7 @@ const SettingPage = () => {
   };
 
   useEffect(() => {
-    if (profile.id === 0) {
-      handleGetProfile();
-    }
-    if (profile.id === 1) {
+    if (profile.id < 2) {
       setOpen(true);
     }
   }, []);
