@@ -129,6 +129,11 @@ export const doHandleBookFavorite = async (
   setBook: React.Dispatch<React.SetStateAction<Book>>,
   userId: number
 ) => {
+  if (userId < 2) {
+    alert("Please login to favorite a book");
+    return false;
+  }
+
   if (book.favorite) {
     const response = await deleteBookFavoriteByBookIdUserId(book.id, userId);
     if (response) {
