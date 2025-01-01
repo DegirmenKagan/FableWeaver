@@ -32,6 +32,10 @@ const BookPage = () => {
     event: React.SyntheticEvent,
     value: number | null
   ) => {
+    if (profile.id < 2) {
+      alert("You need to login to rate a book");
+      return;
+    }
     setUserRating(value ?? 0);
     //patchUserRating(book.id, value);
   };
@@ -101,16 +105,20 @@ const BookPage = () => {
             {book.description}
           </Typography>
           <Box mb={3}>
-            <TextLookup title={booksGenreName} lookupItems={genreLookup} />
+            <TextLookup
+              title={booksGenreName}
+              lookupItems={genreLookup}
+              readonly={profile.id !== book.authorUserId}
+            />
           </Box>
           {/* Book Actions */}
           <Box mb={3}>
             <BookActionButtons book={book} setBook={setBook} detailMode />
           </Box>
           {/* Star Rating */}
-          <Box display="flex" alignItems="center" mb={2}>
-            <Typography variant="h6" mr={1}>
-              Rating:
+          <Box display="flex" alignItems="center" mb={2} sx={{ width: 250 }}>
+            <Typography variant="h6" mr={1} sx={{ flex: 1 }}>
+              Total Rating:
             </Typography>
             <Rating
               name="read-only"
@@ -121,8 +129,8 @@ const BookPage = () => {
           </Box>
 
           {/* User Rating */}
-          <Box>
-            <Typography variant="h6" gutterBottom>
+          <Box display="flex" alignItems="center" mb={2} sx={{ width: 250 }}>
+            <Typography variant="h6" sx={{ flex: 1 }}>
               Your Rating:
             </Typography>
             <Rating

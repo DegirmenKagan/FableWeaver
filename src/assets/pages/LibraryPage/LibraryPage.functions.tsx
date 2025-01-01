@@ -140,12 +140,37 @@ export const openBook = (id: number, navigate: NavigateFunction) => {
   // You can implement navigation to a reading page here
 };
 
-export const readBook = (id: number, navigate: NavigateFunction) => {
+export const readBook = (
+  id: number,
+  navigate: NavigateFunction,
+  profileId: number
+) => {
+  if (profileId < 2) {
+    alert("Please login to read a book");
+    return false;
+  }
   navigate(`/read/${id}`);
 };
 
 // Function to edit a book (this can open an edit modal or navigate to an edit page)
-export const editBook = (id: number, navigate: NavigateFunction) => {
+export const editBook = (
+  id: number,
+  navigate: NavigateFunction,
+  profileId: number,
+  bookAuthorUserId?: number
+) => {
+  if (profileId < 2) {
+    alert("Please login to edit a book");
+    return false;
+  }
+  if (bookAuthorUserId === undefined) {
+    alert("Error fetching book author");
+    return false;
+  }
+  if (bookAuthorUserId !== profileId) {
+    alert("You are not the author of this book");
+    return false;
+  }
   // alert(`Editing book with ID: ${id}`);
   navigate(`/create/${id}`);
 };

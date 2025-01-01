@@ -13,7 +13,6 @@ import {
   CardMedia,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import ViewListIcon from "@mui/icons-material/ViewList";
@@ -27,7 +26,6 @@ import {
   toggleFavorite,
   openBook,
   editBook,
-  deleteBook,
   handleNewBookClick,
   getLibraryBooks,
   readBook,
@@ -190,19 +188,28 @@ const LibraryPage = () => {
                     <OpenInNewIcon />
                   </IconButton>
                   {/* Read Button */}
-                  <IconButton onClick={() => readBook(book.id, navigate)}>
+                  <IconButton
+                    onClick={() => readBook(book.id, navigate, profile.id)}
+                  >
                     <AutoStoriesIcon />
                   </IconButton>
                   {/* Edit Button */}
-                  <IconButton onClick={() => editBook(book.id, navigate)}>
-                    <EditIcon />
-                  </IconButton>
-                  {/* Delete Button */}
-                  <IconButton
-                    onClick={() => deleteBook(book.id, books, setBooks)}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
+                  {book.authorUserId && profile.id === book.authorUserId ? (
+                    <IconButton
+                      onClick={() =>
+                        editBook(
+                          book.id,
+                          navigate,
+                          profile.id,
+                          book.authorUserId
+                        )
+                      }
+                    >
+                      <EditIcon />
+                    </IconButton>
+                  ) : (
+                    <></>
+                  )}
                 </CardActions>
               </Box>
               <CardMedia

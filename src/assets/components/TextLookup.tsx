@@ -10,6 +10,7 @@ export type ILookupItem = {
 type IProps = {
   title: string;
   lookupItems: ILookupItem[];
+  readonly?: boolean;
 };
 
 const TextLookup = (props: IProps) => {
@@ -42,7 +43,10 @@ const TextLookup = (props: IProps) => {
         // color="secondary"
         variant="contained"
         size="small"
-        sx={{ paddingBlock: 0.5 }}
+        sx={{
+          paddingBlock: 0.5,
+          pointerEvents: props.readonly ? "none" : "auto",
+        }}
         aria-controls={open ? "basic-menu" : undefined}
         aria-haspopup="true"
         aria-expanded={open ? "true" : undefined}

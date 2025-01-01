@@ -53,17 +53,27 @@ const BookActionButtons = (props: Props) => {
         )}
 
         {/* Read Button */}
-        <IconButton onClick={() => readBook(book.id, navigate)}>
+        <IconButton onClick={() => readBook(book.id, navigate, profile.id)}>
           <AutoStoriesIcon />
         </IconButton>
-        {/* Edit Button */}
-        <IconButton onClick={() => editBook(book.id, navigate)}>
-          <EditIcon />
-        </IconButton>
-        {/* Delete Button */}
-        <IconButton onClick={() => setMessageModalVisible(true)}>
-          <DeleteIcon />
-        </IconButton>
+        {book.authorUserId && profile.id === book.authorUserId ? (
+          <>
+            {/* Edit Button */}
+            <IconButton
+              onClick={() =>
+                editBook(book.id, navigate, profile.id, book.authorUserId)
+              }
+            >
+              <EditIcon />
+            </IconButton>
+            {/* Delete Button */}
+            <IconButton onClick={() => setMessageModalVisible(true)}>
+              <DeleteIcon />
+            </IconButton>
+          </>
+        ) : (
+          <></>
+        )}
       </Box>
       <MessageDialog
         title={"Delete Book"}

@@ -58,27 +58,17 @@ const BookComments = (props: Props) => {
   const handleAddComment = () => {
     if (newComment.trim() !== "") {
       const comment: IComment = {
-        id: comments.length + 1,
+        // id: comments.length + 1,
         bookId: props.bookId,
         userId: profile.id,
         text: newComment,
       };
-
+      console.log("comment", comment, profile);
       addComment(comment);
-
-      const localComment: ICommentDto = {
-        id: comment.id,
-        createdAt: comment.createdAt,
-        updatedAt: comment.updatedAt,
-        bookId: comment.id,
-        userId: comment.userId, // FIXME: profile.avatar ?? undefined,
-        username: profile.username, // FIXME: profile.username ?? "Anonim"
-        text: comment.text,
-        avatar: undefined, // FIXME: profile.avatar ?? undefined,
-      };
-
-      setComments([localComment, ...comments]);
       setNewComment("");
+      getComments(props.bookId);
+    } else {
+      alert("Please write a comment before posting.");
     }
   };
 
@@ -130,8 +120,13 @@ const BookComments = (props: Props) => {
             alignItems="flex-start"
           >
             <ListItemAvatar>
-              <Avatar sx={{ bgcolor: deepPurple[500] }}>
-                {comment.username ? comment.username.charAt(0) : undefined}
+              <Avatar
+                sx={{ bgcolor: deepPurple[500] }}
+                src={comment.avatar ?? undefined}
+              >
+                {comment.avatar
+                  ? undefined
+                  : comment.username.charAt(0).toUpperCase()}
               </Avatar>
             </ListItemAvatar>
             <ListItemText

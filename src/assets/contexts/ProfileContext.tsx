@@ -9,9 +9,9 @@ type ProfileContextType = {
 
 export const ProfileContext = createContext<ProfileContextType>({
   profile: {
-    id: 0,
+    id: 1,
     created_at: new Date().toISOString(),
-    username: "Guest",
+    username: "guest",
     name: "Guest User",
     avatar: "",
     email: "",
@@ -22,9 +22,9 @@ export const ProfileContext = createContext<ProfileContextType>({
 
 export const ProfileProvider = ({ children }: { children: JSX.Element }) => {
   const guestUser = {
-    id: 0,
+    id: 1,
     created_at: new Date().toISOString(),
-    username: "Guest",
+    username: "guest",
     name: "Guest User",
     avatar: "",
     email: "",

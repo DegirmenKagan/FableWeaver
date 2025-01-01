@@ -4,13 +4,13 @@ import { apiClient } from "../utils/supabase";
 export const getCommentsByBookId = async (bookId: number) => {
   try {
     const { data, error } = await apiClient
-      .from("Comment")
+      .from("comment_view")
       .select()
       .eq("bookId", bookId);
     if (error) {
       throw error;
     }
-    console.log("getCommentsByBookId", data);
+    console.log("getCommentsByBookId", data, bookId);
     const user = data as ICommentDto[];
     return user;
   } catch (error) {

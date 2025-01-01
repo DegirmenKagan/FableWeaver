@@ -40,6 +40,7 @@ export type Book = {
   genreId?: number;
   genrename?: string;
   chapters: BookChapter[];
+  authorUserId?: number;
 };
 
 export type BookTopGenre = {
@@ -64,7 +65,7 @@ export type BookRating = {
 };
 
 export type IComment = {
-  id: number;
+  id?: number;
   createdAt?: Date;
   updatedAt?: Date;
   text: string;
