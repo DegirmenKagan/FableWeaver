@@ -44,6 +44,7 @@ export const logout = async (
         username: "",
         avatar: "",
       });
+      localStorage.removeItem("profile");
     }
   } catch (error) {
     alert("Error logging out");
