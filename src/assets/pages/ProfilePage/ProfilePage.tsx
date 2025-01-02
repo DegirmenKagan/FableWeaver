@@ -48,6 +48,7 @@ const ProfilePage = () => {
     if (profile.id < 2) {
       setOpen(true);
     } else {
+      setOpen(false);
       console.log(profile.bio, "profile.bio");
       setLocalBio(profile.bio ?? "");
       // getBadgesByUserId(); //todo implement this function

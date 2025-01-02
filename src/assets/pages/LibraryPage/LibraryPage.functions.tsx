@@ -100,6 +100,10 @@ export const toggleFavorite = async (
   books: Book[],
   setBooks: React.Dispatch<React.SetStateAction<Book[]>>
 ) => {
+  if (userId < 2) {
+    alert("Please login to favorite a book");
+    return false;
+  }
   if (books.find((x) => x.id === bookId)?.favorite) {
     const response = await deleteBookFavoriteByBookIdUserId(bookId, userId);
     if (response) {

@@ -1,5 +1,5 @@
 import "./ReadPage.css";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -46,6 +46,8 @@ import { Delete, NoteAdd, Save } from "@mui/icons-material";
 import NewChapterDialog from "./NewChapterDialog";
 import MessageDialog from "../../components/MessageDialog";
 import DirectionDialog from "./DirectionDialog";
+import AuthDialog from "../../components/AuthDialog";
+import { ProfileContext } from "../../contexts/ProfileContext";
 
 const ReadPage = () => {
   // State to manage the current page and underlined text
@@ -53,6 +55,7 @@ const ReadPage = () => {
   const [currentPage, setCurrentPage] = useState(-1);
   const [markdown, setMarkdown] = useState<string>(""); // chapters[0]?.content
   const { bookId } = useParams();
+  const { profile } = useContext(ProfileContext);
   //get route from url
   const location = useLocation();
 
@@ -78,6 +81,8 @@ const ReadPage = () => {
       bookId: 0,
       chapterId: 0,
     });
+
+  const [open, setOpen] = useState<boolean>(false);
 
   useEffect(() => {
     if (currentPage >= 0 && currentPage < chapters.length) {
@@ -130,73 +135,86 @@ const ReadPage = () => {
     }
   }, [bookDirectionList]);
 
-  return (
-    <Box display="flex" width="100%" height="100vh" p={2}>
-      <Typography variant="h4" gutterBottom>
-        {}
-      </Typography>
-      {/* Chapter Tree (Left Sidebar) */}
-      <Box flex="1" pr={2}>
-        <Typography variant="h4" gutterBottom>
-          Chapters
-        </Typography>
-        <List>
-          {chapters.map((chapter) => (
-            <ListItem
-              className="chapterListItem"
-              key={chapter.chapterId}
-              onClick={() =>
-                handleChapterClick(
-                  chapter.chapterId,
-                  chapters,
-                  currentPage,
-                  markdown,
-                  setCheckModalVisible,
-                  setCurrentPage
-                )
-              }
-              style={{
-                backgroundColor:
-                  currentPage === chapter.id - 1 ? "lightgray" : undefined,
-              }}
-            >
-              {chapter.title}
-            </ListItem>
-          ))}
-        </List>
-      </Box>
+  useEffect(() => {
+    if (profile.id < 2) {
+      console.log("profile.id", profile);
+      setOpen(true);
+    } else {
+      setOpen(false);
+    }
+  }, [profile]);
 
-      {/* Text Reader (Middle Section) */}
-      <Box flex="2" px={2}>
-        <StyledPaper>
-          {markdown === "" ? (
-            <Box sx={{ display: "flex" }}>
-              <CircularProgress />
-            </Box>
-          ) : isReadPage ? (
-            <MDXEditor
-              markdown={markdown}
-              readOnly
-              plugins={[
-                headingsPlugin(),
-                listsPlugin(),
-                quotePlugin(),
-                thematicBreakPlugin(),
-                markdownShortcutPlugin(),
-              ]}
-            />
-          ) : (
-            <MDXEditor
-              markdown={markdown}
-              onChange={(value) => setMarkdown(value)}
-              plugins={[
-                toolbarPlugin({
-                  toolbarContents: () => (
-                    <>
-                      <UndoRedo />
-                      <BoldItalicUnderlineToggles />
-                      <BlockTypeSelect />
-                      {/* <ButtonWithTooltip
+  return (
+    <>
+      {profile.id < 2 ? (
+        <AuthDialog open={open} setOpen={setOpen} />
+      ) : (
+        <Box display="flex" width="100%" height="100vh" p={2}>
+          <Typography variant="h4" gutterBottom>
+            {}
+          </Typography>
+          {/* Chapter Tree (Left Sidebar) */}
+          <Box flex="1" pr={2}>
+            <Typography variant="h4" gutterBottom>
+              Chapters
+            </Typography>
+            <List>
+              {chapters.map((chapter) => (
+                <ListItem
+                  className="chapterListItem"
+                  key={chapter.chapterId}
+                  onClick={() =>
+                    handleChapterClick(
+                      chapter.chapterId,
+                      chapters,
+                      currentPage,
+                      markdown,
+                      setCheckModalVisible,
+                      setCurrentPage
+                    )
+                  }
+                  style={{
+                    backgroundColor:
+                      currentPage === chapter.id - 1 ? "lightgray" : undefined,
+                  }}
+                >
+                  {chapter.title}
+                </ListItem>
+              ))}
+            </List>
+          </Box>
+
+          {/* Text Reader (Middle Section) */}
+          <Box flex="2" px={2}>
+            <StyledPaper>
+              {markdown === "" ? (
+                <Box sx={{ display: "flex" }}>
+                  <CircularProgress />
+                </Box>
+              ) : isReadPage ? (
+                <MDXEditor
+                  markdown={markdown}
+                  readOnly
+                  plugins={[
+                    headingsPlugin(),
+                    listsPlugin(),
+                    quotePlugin(),
+                    thematicBreakPlugin(),
+                    markdownShortcutPlugin(),
+                  ]}
+                />
+              ) : (
+                <MDXEditor
+                  markdown={markdown}
+                  onChange={(value) => setMarkdown(value)}
+                  plugins={[
+                    toolbarPlugin({
+                      toolbarContents: () => (
+                        <>
+                          <UndoRedo />
+                          <BoldItalicUnderlineToggles />
+                          <BlockTypeSelect />
+                          {/* <ButtonWithTooltip
                         title="Save Button"
                         onClick={() =>
                           console.log("Custom Button Clicked!", markdown)
@@ -204,178 +222,184 @@ const ReadPage = () => {
                       >
                         <SaveIcon sx={{ width: 20 }} />
                       </ButtonWithTooltip> */}
-                      <Box sx={{ flex: 1 }}></Box>
-                    </>
-                  ),
-                }),
-                headingsPlugin(),
-                listsPlugin(),
-                quotePlugin(),
-                thematicBreakPlugin(),
-                markdownShortcutPlugin(),
-              ]}
-            />
-          )}
-        </StyledPaper>
-      </Box>
+                          <Box sx={{ flex: 1 }}></Box>
+                        </>
+                      ),
+                    }),
+                    headingsPlugin(),
+                    listsPlugin(),
+                    quotePlugin(),
+                    thematicBreakPlugin(),
+                    markdownShortcutPlugin(),
+                  ]}
+                />
+              )}
+            </StyledPaper>
+          </Box>
 
-      {/* Page Controls (Right Sidebar) */}
-      <Box flex="1" pl={2}>
-        {/* <Typography variant="h6" gutterBottom>
+          {/* Page Controls (Right Sidebar) */}
+          <Box flex="1" pl={2}>
+            {/* <Typography variant="h6" gutterBottom>
            Empty Space 
         </Typography> */}
-        <Box display="flex" flexDirection="column" gap={2}>
-          <Button
-            variant="contained"
-            startIcon={<ArrowBackIcon />}
-            // onClick={() => handlePrevChapter(currentPage, setCurrentPage)}
-            onClick={() =>
-              checkUnsavedChapterChanges(
-                chapters,
-                currentPage,
-                setCurrentPage,
-                markdown,
-                setCheckModalVisible,
-                false,
-                setIsNext
-              )
-            }
-            disabled={currentPage === 0}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<ArrowForwardIcon />}
-            // onClick={() =>
-            //   handleNextChapter(currentPage, setCurrentPage, chapters)
-            // }
-            onClick={() =>
-              checkUnsavedChapterChanges(
-                chapters,
-                currentPage,
-                setCurrentPage,
-                markdown,
-                setCheckModalVisible,
-                true,
-                setIsNext
-              )
-            }
-            disabled={currentPage === chapters.length - 1}
-          >
-            Next
-          </Button>
-          <>
-            {(currentBookDirection.pathOneChapterId ?? 0) > 0 ? (
+            <Box display="flex" flexDirection="column" gap={2}>
               <Button
                 variant="contained"
-                color="secondary"
-                startIcon={<TurnLeftIcon />}
+                startIcon={<ArrowBackIcon />}
+                // onClick={() => handlePrevChapter(currentPage, setCurrentPage)}
                 onClick={() =>
-                  setCurrentPage(currentBookDirection.pathOneChapterId! - 1)
+                  checkUnsavedChapterChanges(
+                    chapters,
+                    currentPage,
+                    setCurrentPage,
+                    markdown,
+                    setCheckModalVisible,
+                    false,
+                    setIsNext
+                  )
                 }
+                disabled={currentPage === 0}
               >
-                {currentBookDirection.pathOneDesc}
+                Previous
               </Button>
-            ) : (
-              <></>
-            )}
-            {(currentBookDirection.pathTwoChapterId ?? 0) > 0 ? (
               <Button
                 variant="contained"
-                color="secondary"
-                startIcon={<TurnRightIcon />}
+                startIcon={<ArrowForwardIcon />}
+                // onClick={() =>
+                //   handleNextChapter(currentPage, setCurrentPage, chapters)
+                // }
                 onClick={() =>
-                  setCurrentPage(currentBookDirection.pathTwoChapterId! - 1)
+                  checkUnsavedChapterChanges(
+                    chapters,
+                    currentPage,
+                    setCurrentPage,
+                    markdown,
+                    setCheckModalVisible,
+                    true,
+                    setIsNext
+                  )
                 }
+                disabled={currentPage === chapters.length - 1}
               >
-                {currentBookDirection.pathTwoDesc}
+                Next
               </Button>
-            ) : (
-              <></>
-            )}
-          </>
-          {isReadPage ? (
-            <></>
-          ) : (
-            <>
-              <Button
-                variant="contained"
-                startIcon={<CallSplitIcon />}
-                onClick={() => setDirectionDialogVisible(true)}
-              >
-                Add Direction
-              </Button>
-              <Button
-                variant="contained"
-                startIcon={<NoteAdd />}
-                onClick={() => setNewChapterDialogVisible(true)}
-              >
-                Add Chapter
-              </Button>
-              <Button
-                variant="contained"
-                startIcon={<Delete />}
-                onClick={() =>
-                  handleDeleteChapter(chapters, currentPage, setCurrentPage)
-                }
-                disabled={chapters.length <= 1} // add the "if user is not an editor"
-              >
-                Delete Chapter
-              </Button>
-              <Button
-                variant="contained"
-                startIcon={<Save />}
-                onClick={() =>
-                  handleSaveChapter(chapters, markdown, currentPage)
-                }
-                disabled={chapters.length <= 1} // add the "if user is not an editor"
-              >
-                Save Chapter
-              </Button>
-            </>
-          )}
+              <>
+                {(currentBookDirection.pathOneChapterId ?? 0) > 0 ? (
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    startIcon={<TurnLeftIcon />}
+                    onClick={() =>
+                      setCurrentPage(currentBookDirection.pathOneChapterId! - 1)
+                    }
+                  >
+                    {currentBookDirection.pathOneDesc}
+                  </Button>
+                ) : (
+                  <></>
+                )}
+                {(currentBookDirection.pathTwoChapterId ?? 0) > 0 ? (
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    startIcon={<TurnRightIcon />}
+                    onClick={() =>
+                      setCurrentPage(currentBookDirection.pathTwoChapterId! - 1)
+                    }
+                  >
+                    {currentBookDirection.pathTwoDesc}
+                  </Button>
+                ) : (
+                  <></>
+                )}
+              </>
+              {isReadPage ? (
+                <></>
+              ) : (
+                <>
+                  <Button
+                    variant="contained"
+                    startIcon={<CallSplitIcon />}
+                    onClick={() => setDirectionDialogVisible(true)}
+                  >
+                    Add Direction
+                  </Button>
+                  <Button
+                    variant="contained"
+                    startIcon={<NoteAdd />}
+                    onClick={() => setNewChapterDialogVisible(true)}
+                  >
+                    Add Chapter
+                  </Button>
+                  <Button
+                    variant="contained"
+                    startIcon={<Delete />}
+                    onClick={() =>
+                      handleDeleteChapter(chapters, currentPage, setCurrentPage)
+                    }
+                    disabled={chapters.length <= 1} // add the "if user is not an editor"
+                  >
+                    Delete Chapter
+                  </Button>
+                  <Button
+                    variant="contained"
+                    startIcon={<Save />}
+                    onClick={() =>
+                      handleSaveChapter(chapters, markdown, currentPage)
+                    }
+                    disabled={chapters.length <= 1} // add the "if user is not an editor"
+                  >
+                    Save Chapter
+                  </Button>
+                </>
+              )}
+            </Box>
+            <NewChapterDialog
+              dialogVisible={newChapterDialogVisible}
+              setDialogVisible={setNewChapterDialogVisible}
+              bookId={validBookId}
+              chaptersLength={chapters.length}
+              setCurrentPage={setCurrentPage}
+              _onAddChapter={() =>
+                doGetBookChaptersByBookId(
+                  validBookId,
+                  setChapters,
+                  setCurrentPage
+                )
+              }
+              // doGetBookChaptersByBookId(_validId, setChapters, setCurrentPage);
+            />
+
+            <DirectionDialog
+              dialogVisible={directionDialogVisible}
+              setDialogVisible={setDirectionDialogVisible}
+              bookId={validBookId}
+              chapters={chapters}
+              currentPage={currentPage}
+              _onAfterOK={() => {
+                doGetBookDirectionByBookId(validBookId, setBookDirectionList);
+              }}
+            />
+
+            <MessageDialog
+              title={"You have unsaved changes"}
+              dialogVisible={checkModalVisible}
+              setDialogVisible={setCheckModalVisible}
+              _onOKClick={() =>
+                isNext
+                  ? handleNextChapter(currentPage, setCurrentPage, chapters)
+                  : handlePrevChapter(currentPage, setCurrentPage)
+              }
+            >
+              <Typography>
+                You have unsaved changes. Are you sure you want to leave this
+                chapter?
+              </Typography>
+            </MessageDialog>
+          </Box>
         </Box>
-        <NewChapterDialog
-          dialogVisible={newChapterDialogVisible}
-          setDialogVisible={setNewChapterDialogVisible}
-          bookId={validBookId}
-          chaptersLength={chapters.length}
-          setCurrentPage={setCurrentPage}
-          _onAddChapter={() =>
-            doGetBookChaptersByBookId(validBookId, setChapters, setCurrentPage)
-          }
-          // doGetBookChaptersByBookId(_validId, setChapters, setCurrentPage);
-        />
-
-        <DirectionDialog
-          dialogVisible={directionDialogVisible}
-          setDialogVisible={setDirectionDialogVisible}
-          bookId={validBookId}
-          chapters={chapters}
-          currentPage={currentPage}
-          _onAfterOK={() => {
-            doGetBookDirectionByBookId(validBookId, setBookDirectionList);
-          }}
-        />
-
-        <MessageDialog
-          title={"You have unsaved changes"}
-          dialogVisible={checkModalVisible}
-          setDialogVisible={setCheckModalVisible}
-          _onOKClick={() =>
-            isNext
-              ? handleNextChapter(currentPage, setCurrentPage, chapters)
-              : handlePrevChapter(currentPage, setCurrentPage)
-          }
-        >
-          <Typography>
-            You have unsaved changes. Are you sure you want to leave this
-            chapter?
-          </Typography>
-        </MessageDialog>
-      </Box>
-    </Box>
+      )}
+    </>
   );
 };
 

@@ -175,9 +175,12 @@ const SettingPage = () => {
 
   useEffect(() => {
     if (profile.id < 2) {
+      console.log("profile.id", profile);
       setOpen(true);
+    } else {
+      setOpen(false);
     }
-  }, []);
+  }, [profile]);
 
   useEffect(() => {
     if (profile) {
